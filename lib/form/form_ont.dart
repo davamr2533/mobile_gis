@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 Future<void> showFormOnt(BuildContext context) {
   return showDialog(
     context: context,
+    useSafeArea: true,
     builder: (BuildContext context) {
       String? selectedProv;
       List<String> dialogProvinsi = [];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 Future<void> showFormTiang(BuildContext context) {
@@ -206,7 +207,10 @@ Future<void> showFormTiang(BuildContext context) {
 
                       FilledButton(
                         onPressed: () {
-
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MapPage()),
+                          );
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.fifthBase,

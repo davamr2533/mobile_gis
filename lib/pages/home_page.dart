@@ -48,172 +48,181 @@ class _HomePage extends State<HomePage> {
         ),
         Container(
           margin: const EdgeInsets.only(left: 20, right: 20, top: 60),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: Row(
-                  children: [
-                    Text(
-                      "Anda Offline!",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 80,
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Anda Offline!",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.signal_cellular_alt,
-                      size: 34,
-                      color: AppColors.signalOff,
-                    ),
-                  ],
+                      const Spacer(),
+                      const Icon(
+                        Icons.signal_cellular_alt,
+                        size: 34,
+                        color: AppColors.signalOff,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // === CARD INFO UTAMA ===
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Colors.white,
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "GIS Mobile",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
+                // === CARD INFO UTAMA ===
+                SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "GIS Mobile",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "Explore, locate, synchronize",
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.textSoftGray,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                Text(
+                                  "Explore, locate, synchronize",
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.textSoftGray,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.gpsOff,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                padding: const EdgeInsets.all(8),
-                                child: Center(
-                                  child: Text(
-                                    "GPS Offline",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textRed,
+                                const SizedBox(height: 10),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.gpsOff,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.all(8),
+                                  child: Center(
+                                    child: Text(
+                                      "GPS Offline",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textRed,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Image.asset(
-                          'assets/profil.png',
-                          width: 80,
-                          height: 80,
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          Image.asset(
+                            'assets/profil.png',
+                            width: 80,
+                            height: 80,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 35),
+                const SizedBox(height: 35),
 
-              // === CARD ONT & TIANG ===
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                // === CARD ONT & TIANG ===
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
 
-                    // === CARD ONT ===
-                    buildMenuCard(
-                      icon: Icons.router,
-                      label: "Form ONT",
-                      color: AppColors.secondBase,
-                      onPressed: () => showFormOnt(context)
-                    ),
-
-                    const SizedBox(width: 25),
-
-                    // === CARD TIANG ===
-                    buildMenuCard(
-                      icon: Icons.wifi,
-                      label: "Form Tiang",
-                      color: AppColors.thirdBase,
-                      onPressed: () => showFormTiang(context)
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // === HISTORY ===
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    Text(
-                      "History",
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                      // === CARD ONT ===
+                      buildMenuCard(
+                          icon: Icons.router,
+                          label: "Form ONT",
+                          color: AppColors.secondBase,
+                          onPressed: () => showFormOnt(context)
                       ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      "See All",
-                      style: GoogleFonts.poppins(
-                        color: AppColors.secondBase,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+
+                      const SizedBox(width: 25),
+
+                      // === CARD TIANG ===
+                      buildMenuCard(
+                          icon: Icons.wifi,
+                          label: "Form Tiang",
+                          color: AppColors.thirdBase,
+                          onPressed: () => showFormTiang(context)
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              const HistoryCard(
-                id: "GIS-ONT-1224",
-                location: "Yogyakarta",
-                status: "Pending",
-              ),
-              const HistoryCard(
-                id: "GIS-ONT-1234",
-                location: "Surakarta",
-                status: "Pending",
-              ),
-              const HistoryCard(
-                id: "GIS-ONT-2255",
-                location: "Jakarta",
-                status: "Verified",
-                sideColor: AppColors.secondBase,
-              ),
-            ],
+
+                const SizedBox(height: 40),
+
+                // === HISTORY ===
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        "History",
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        "See All",
+                        style: GoogleFonts.poppins(
+                          color: AppColors.secondBase,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const HistoryCard(
+                  id: "GIS-ONT-1224",
+                  location: "Yogyakarta",
+                  status: "Pending",
+                ),
+                const HistoryCard(
+                  id: "GIS-ONT-1234",
+                  location: "Surakarta",
+                  status: "Pending",
+                ),
+                const HistoryCard(
+                  id: "GIS-ONT-2255",
+                  location: "Jakarta",
+                  status: "Verified",
+                  sideColor: AppColors.secondBase,
+                ),
+              ],
+            ),
+
           ),
+
+
+
         ),
       ],
     );

@@ -36,9 +36,20 @@ class _MainPage extends State<MainPage> {
     ];
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       extendBody: true,
       backgroundColor: AppColors.background,
-      body: _pages[_currentIndex],
+
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _pages[_currentIndex],
+          ),
+        ),
+      ),
+
       bottomNavigationBar: CurvedNavigationBar(
         color: Colors.white,
         buttonBackgroundColor: AppColors.thirdBase,
