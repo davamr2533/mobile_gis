@@ -13,5 +13,6 @@ class AppColors {
   static const Color textSoftGray = Color(0xFFA9A9A9);
   static const Color textRed = Color(0xFF9F8D65);
   static const Color textPending = Color(0xFFFF4747);
+  static const Color navBar = Color(0xFF808080);
 
 }

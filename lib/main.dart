@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Mobile GIS',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        useMaterial3: false
       ),
       home: const SplashScreen(),
     );
