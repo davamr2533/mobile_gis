@@ -33,11 +33,12 @@ dependencies:
 
 
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
-  curved_navigation_bar: ^1.0.1
-  http: ^1.2.0
-  flutter_map: ^7.0.1
-  latlong2: ^0.9.1
+  google_fonts: ^6.2.1            #untuk menggunakan google font
+  curved_navigation_bar: ^1.0.1   #untuk menggunakan nav bar
+  http: ^1.2.0                    #untuk menggunakan api http
+  flutter_map: ^7.0.1             #untuk menggunakan map osm
+  latlong2: ^0.9.1                #untuk menggunakan latitude dan longitude
+  geolocator: ^13.0.1             #untuk mengambil koordinat GPS
 
 dev_dependencies:
   flutter_test:
