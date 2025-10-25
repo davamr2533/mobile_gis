@@ -33,24 +33,63 @@ class HistoryTabCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            ClipRRect(
-                borderRadius: BorderRadiusGeometry.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+            
+            Stack(
+              children: [
+
+                ClipRRect(
+                    borderRadius: BorderRadiusGeometry.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                    child: ColorFiltered(
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withValues(alpha: 0.2),
+                        BlendMode.darken,
+                      ),
+                      child: Image.asset(
+                        'assets/tiang_sample.webp',
+                        width: double.infinity,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    )
                 ),
-                child: ColorFiltered(
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withValues(alpha: 0.2),
-                    BlendMode.darken,
-                  ),
-                  child: Image.asset(
-                    'assets/tiang_sample.webp',
-                    width: double.infinity,
-                    height: 100,
-                    fit: BoxFit.cover,
+
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "25-10-2025",
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.white
+                        ),
+                      ),
+
+                      SizedBox(height: 45),
+
+                      Text(
+                        id,
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.white
+                        ),
+                      ),
+                    ],
                   ),
                 )
+
+
+
+              ],
             ),
+            
+
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

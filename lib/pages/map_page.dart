@@ -92,10 +92,8 @@ class _MapPage extends State<MapPage> {
         latitude = position.latitude;
         longitude = position.longitude;
       });
-
-      final currentZoom = _mapController.camera.zoom;
-      _mapController.move(LatLng(position.latitude, position.longitude), currentZoom);
     });
+
   }
 
   @override

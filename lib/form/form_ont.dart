@@ -3,6 +3,9 @@ import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
 
 Future<void> showFormOnt(BuildContext context) {
 
@@ -44,7 +47,7 @@ Future<void> showFormOnt(BuildContext context) {
             backgroundColor: Colors.white,
             child: SizedBox(
               width: 350,
-              height: 750,
+              height: 720,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: SingleChildScrollView(
@@ -214,6 +217,52 @@ Future<void> showFormOnt(BuildContext context) {
 
                       SizedBox(height: 8),
 
+                      //Map Preview
+                      if (selectedLatitude != null && selectedLongitude != null)
+                        Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.textSoftGray, width: 1),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: AbsorbPointer(
+                              absorbing: true, // Nonaktifkan interaksi
+                              child: FlutterMap(
+                                mapController: MapController(),
+                                options: MapOptions(
+                                  initialCenter: LatLng(selectedLatitude!, selectedLongitude!),
+                                  initialZoom: 16,
+                                ),
+                                children: [
+                                  TileLayer(
+                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    userAgentPackageName: 'com.example.gis_mobile',
+                                  ),
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        point: LatLng(selectedLatitude!, selectedLongitude!),
+                                        width: 50,
+                                        height: 50,
+                                        rotate: true,
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          color: Colors.red,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      SizedBox(height: 8),
+
                       FilledButton(
                         onPressed: () async {
                           final result = await Navigator.push(
@@ -236,11 +285,11 @@ Future<void> showFormOnt(BuildContext context) {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: EdgeInsets.all(12),
-                          minimumSize: Size(double.infinity, 80),
+                          minimumSize: Size(double.infinity, 40),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           elevation: 0,
                         ),
-                        child: Column(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -248,17 +297,20 @@ Future<void> showFormOnt(BuildContext context) {
                               size: 20,
                               color: Colors.black54,
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(width: 8),
                             Text(
                               "Atur Koordinat Lokasi",
                               style: GoogleFonts.poppins(
                                 color: Colors.black54,
                                 fontWeight: FontWeight.w500,
+                                fontSize: 13
                               ),
                             ),
                           ],
                         ),
                       ),
+
+
 
 
                       SizedBox(height: 12),
@@ -338,6 +390,10 @@ Future<void> showFormOnt(BuildContext context) {
                           )
                         ],
                       ),
+
+
+
+
 
                       SizedBox(height: 20),
 

@@ -25,7 +25,7 @@ class HistoryCard extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 12),
           width: double.infinity,
-          height: 70,
+          height: 60,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             color: Colors.white,
@@ -44,7 +44,7 @@ class HistoryCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSoftGray,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -53,7 +53,7 @@ class HistoryCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        fontSize: 22,
+                        fontSize: 18,
                       ),
                     ),
                   ],
@@ -79,7 +79,7 @@ class HistoryCard extends StatelessWidget {
         // Garis warna di sisi kiri
         Container(
           width: 10,
-          height: 70,
+          height: 60,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
