@@ -1,18 +1,33 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 
 Future<void> showFormTiang(BuildContext context) {
+
+  double? selectedLatitude;
+  double? selectedLongitude;
+  List<XFile> selectedImages = [];
+
   return showDialog(
     context: context,
+    useSafeArea: true,
     builder: (BuildContext context) {
       String? selectedProv;
       List<String> dialogProvinsi = [];
 
       return StatefulBuilder(
         builder: (context, setStateDialog) {
+
+
+
+
           // ambil data provinsi saat dialog muncul
           Future<void> loadProvinsi() async {
             final provinsi = await getProvinsi();
@@ -35,7 +50,7 @@ Future<void> showFormTiang(BuildContext context) {
             backgroundColor: Colors.white,
             child: SizedBox(
               width: 350,
-              height: 750,
+              height: 720,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: SingleChildScrollView(
@@ -50,7 +65,7 @@ Future<void> showFormTiang(BuildContext context) {
                             .spaceBetween,
                         children: [
                           Text(
-                            "Form Tiang",
+                            "Form ONT",
                             style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -72,51 +87,176 @@ Future<void> showFormTiang(BuildContext context) {
 
                       // === ICON ADD PHOTO ===
                       Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color:
-                                AppColors.fourthBase,
-                                borderRadius:
-                                BorderRadius.circular(
-                                    50),
+                        child: GestureDetector(
+                          onTap: () async {
+                            showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                               ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons
-                                      .add_a_photo_outlined,
-                                  size: 30,
+                              builder: (context) {
+                                return SafeArea(
+                                  child: Wrap(
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(Icons.camera_alt, color: Colors.black87),
+                                        title: Text(
+                                          "Ambil Foto dari Kamera",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          Navigator.pop(context); // tutup sheet
+
+                                          final ImagePicker picker = ImagePicker();
+                                          final XFile? photo = await picker.pickImage(
+                                            source: ImageSource.camera,
+                                            imageQuality: 80,
+                                          );
+
+                                          if (photo != null) {
+                                            setStateDialog(() {
+                                              if (selectedImages.length < 3) {
+                                                selectedImages.add(photo);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text("Maksimal 3 foto aja ya 😄"),
+                                                  ),
+                                                );
+                                              }
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.photo_library, color: Colors.black87),
+                                        title: Text(
+                                          "Pilih dari Galeri",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          Navigator.pop(context); // tutup sheet
+
+                                          final ImagePicker picker = ImagePicker();
+                                          final List<XFile> images = await picker.pickMultiImage(
+                                            imageQuality: 80,
+                                          );
+
+                                          if (images.isNotEmpty) {
+                                            setStateDialog(() {
+                                              if (images.length > 3) {
+                                                selectedImages = images.take(3).toList();
+                                              } else {
+                                                selectedImages = images;
+                                              }
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+
+
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: AppColors.fourthBase,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.add_a_photo_outlined,
+                                    size: 30,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Tambahkan foto tiang",
-                              style:
-                              GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight:
-                                FontWeight.w600,
-                                color: Colors.black,
+                              const SizedBox(height: 8),
+                              Text(
+                                "Tambahkan foto tiang",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Foto : 0/3",
-                              style:
-                              GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight:
-                                FontWeight.w500,
-                                color: AppColors
-                                    .textSoftGray,
+                              Text(
+                                "Foto : ${selectedImages.length}/3",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textSoftGray,
+                                ),
                               ),
-                            ),
-                          ],
+
+                              if (selectedImages.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Wrap(
+                                    spacing: 8,
+                                    children: selectedImages.asMap().entries.map((entry) {
+                                      final i = entry.key;
+                                      final img = entry.value;
+                                      return Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              File(img.path),
+                                              width: 70,
+                                              height: 70,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 0,
+                                            top: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setStateDialog(() {
+                                                  selectedImages.removeAt(i);
+                                                });
+                                              },
+                                              child: Container(
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black54,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                padding: const EdgeInsets.all(4),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+
+
+
+
+
+
+                            ],
+                          ),
                         ),
                       ),
+
 
                       const SizedBox(height: 16),
 
@@ -205,12 +345,67 @@ Future<void> showFormTiang(BuildContext context) {
 
                       SizedBox(height: 8),
 
+                      //Map Preview
+                      if (selectedLatitude != null && selectedLongitude != null)
+                        Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.textSoftGray, width: 1),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: AbsorbPointer(
+                              absorbing: true, // Nonaktifkan interaksi
+                              child: FlutterMap(
+                                mapController: MapController(),
+                                options: MapOptions(
+                                  initialCenter: LatLng(selectedLatitude!, selectedLongitude!),
+                                  initialZoom: 16,
+                                ),
+                                children: [
+                                  TileLayer(
+                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    userAgentPackageName: 'com.example.gis_mobile',
+                                  ),
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        point: LatLng(selectedLatitude!, selectedLongitude!),
+                                        width: 50,
+                                        height: 50,
+                                        rotate: true,
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          color: Colors.red,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      SizedBox(height: 8),
+
                       FilledButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          final result = await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const MapPage()),
+                            MaterialPageRoute(builder: (context) => MapPage()),
                           );
+
+                          if (result != null) {
+                            // result adalah LatLng (latitude & longitude)
+                            setStateDialog(() {
+                              selectedLatitude = result.latitude;
+                              selectedLongitude = result.longitude;
+                            });
+                          }
+
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.fifthBase,
@@ -218,11 +413,11 @@ Future<void> showFormTiang(BuildContext context) {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: EdgeInsets.all(12),
-                          minimumSize: Size(double.infinity, 80),
+                          minimumSize: Size(double.infinity, 40),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           elevation: 0,
                         ),
-                        child: Column(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -230,17 +425,21 @@ Future<void> showFormTiang(BuildContext context) {
                               size: 20,
                               color: Colors.black54,
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(width: 8),
                             Text(
                               "Atur Koordinat Lokasi",
                               style: GoogleFonts.poppins(
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w500,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13
                               ),
                             ),
                           ],
                         ),
                       ),
+
+
+
 
                       SizedBox(height: 12),
 
@@ -270,7 +469,7 @@ Future<void> showFormTiang(BuildContext context) {
                                   ),
                                 ),
                                 child: Text(
-                                  "123909",
+                                  selectedLatitude != null ? selectedLatitude!.toStringAsFixed(6) : "-",
                                   style: GoogleFonts.poppins(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500
@@ -309,16 +508,20 @@ Future<void> showFormTiang(BuildContext context) {
                                   ),
                                 ),
                                 child: Text(
-                                  "9090909",
+                                  selectedLongitude != null ? selectedLongitude!.toStringAsFixed(6) : "-",
                                   style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500
                                   ),
                                 ),
                               )
                           )
                         ],
                       ),
+
+
+
+
 
                       SizedBox(height: 20),
 
@@ -358,6 +561,7 @@ Future<void> showFormTiang(BuildContext context) {
       );
     },
   );
+
 }
 
 Widget _buildTextField(String hint, {int maxLines = 1}) {
