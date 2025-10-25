@@ -44,22 +44,19 @@ class _MapPage extends State<MapPage> {
       return;
     }
 
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.bestForNavigation,
-        ),
-      );
+    Position position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+      ),
+    );
 
-      setState(() {
-        latitude = position.latitude;
-        longitude = position.longitude;
-      });
+    setState(() {
+      latitude = position.latitude;
+      longitude = position.longitude;
+    });
 
-      _mapController.move(LatLng(position.latitude, position.longitude), 17);
-    } catch (e) {
-      print("Error ambil lokasi: $e");
-    }
+    _mapController.move(LatLng(position.latitude, position.longitude), 17);
+
   }
 
   // 🔹 Pindahkan map ke posisi GPS terakhir
@@ -171,7 +168,7 @@ class _MapPage extends State<MapPage> {
             ],
           ),
 
-          // 📍 Pin di tengah layar (penentu lokasi)
+          // Pin di tengah layar (penentu lokasi)
           const Center(
             child: IgnorePointer(
               ignoring: true,
@@ -183,7 +180,7 @@ class _MapPage extends State<MapPage> {
             ),
           ),
 
-          // 🧭 Tombol Lokasi Saya
+          // Tombol untuk kembali ke lokasi user
           Positioned(
             bottom: 250,
             right: 16,
@@ -195,7 +192,7 @@ class _MapPage extends State<MapPage> {
             ),
           ),
 
-          // 🗺️ Card bawah tetap sama
+
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -256,21 +253,8 @@ class _MapPage extends State<MapPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Ambil titik tengah map (pin)
                         final center = _mapController.camera.center;
-                        setState(() {
-                          _selectedLocation = center;
-                        });
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Titik dipilih: "
-                                  "${center.latitude.toStringAsFixed(6)}, "
-                                  "${center.longitude.toStringAsFixed(6)}",
-                            ),
-                          ),
-                        );
+                        Navigator.pop(context, center);
                       },
                       style: ElevatedButton.styleFrom(
                         elevation: 0,

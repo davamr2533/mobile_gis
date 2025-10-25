@@ -5,6 +5,10 @@ import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 Future<void> showFormOnt(BuildContext context) {
+
+  double? selectedLatitude;
+  double? selectedLongitude;
+
   return showDialog(
     context: context,
     useSafeArea: true,
@@ -14,6 +18,10 @@ Future<void> showFormOnt(BuildContext context) {
 
       return StatefulBuilder(
         builder: (context, setStateDialog) {
+
+
+
+
           // ambil data provinsi saat dialog muncul
           Future<void> loadProvinsi() async {
             final provinsi = await getProvinsi();
@@ -207,11 +215,20 @@ Future<void> showFormOnt(BuildContext context) {
                       SizedBox(height: 8),
 
                       FilledButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          final result = await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const MapPage()),
+                            MaterialPageRoute(builder: (context) => MapPage()),
                           );
+
+                          if (result != null) {
+                            // result adalah LatLng (latitude & longitude)
+                            setStateDialog(() {
+                              selectedLatitude = result.latitude;
+                              selectedLongitude = result.longitude;
+                            });
+                          }
+
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.fifthBase,
@@ -272,7 +289,7 @@ Future<void> showFormOnt(BuildContext context) {
                                   ),
                                 ),
                                 child: Text(
-                                  "123909",
+                                 selectedLatitude != null ? selectedLatitude!.toStringAsFixed(6) : "-",
                                   style: GoogleFonts.poppins(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500
@@ -311,7 +328,7 @@ Future<void> showFormOnt(BuildContext context) {
                                   ),
                                 ),
                                 child: Text(
-                                  "9090909",
+                                  selectedLongitude != null ? selectedLongitude!.toStringAsFixed(6) : "-",
                                   style: GoogleFonts.poppins(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500
