@@ -90,19 +90,81 @@ Future<void> showFormOnt(BuildContext context) {
                       Center(
                         child: GestureDetector(
                           onTap: () async {
-                            final ImagePicker picker = ImagePicker();
-                            final List<XFile> images = await picker.pickMultiImage();
+                            showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                              ),
+                              builder: (context) {
+                                return SafeArea(
+                                  child: Wrap(
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(Icons.camera_alt, color: Colors.black87),
+                                        title: Text(
+                                          "Ambil Foto dari Kamera",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          Navigator.pop(context); // tutup sheet
 
-                            if (images.isNotEmpty) {
-                              setStateDialog(() {
-                                if (images.length > 3) {
-                                  selectedImages = images.take(3).toList(); // batasi 3 foto
-                                } else {
-                                  selectedImages = images;
-                                }
-                              });
-                            }
+                                          final ImagePicker picker = ImagePicker();
+                                          final XFile? photo = await picker.pickImage(
+                                            source: ImageSource.camera,
+                                            imageQuality: 80,
+                                          );
+
+                                          if (photo != null) {
+                                            setStateDialog(() {
+                                              if (selectedImages.length < 3) {
+                                                selectedImages.add(photo);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text("Maksimal 3 foto aja ya 😄"),
+                                                  ),
+                                                );
+                                              }
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.photo_library, color: Colors.black87),
+                                        title: Text(
+                                          "Pilih dari Galeri",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          Navigator.pop(context); // tutup sheet
+
+                                          final ImagePicker picker = ImagePicker();
+                                          final List<XFile> images = await picker.pickMultiImage(
+                                            imageQuality: 80,
+                                          );
+
+                                          if (images.isNotEmpty) {
+                                            setStateDialog(() {
+                                              if (images.length > 3) {
+                                                selectedImages = images.take(3).toList();
+                                              } else {
+                                                selectedImages = images;
+                                              }
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
                           },
+
 
                           child: Column(
                             children: [
@@ -143,19 +205,49 @@ Future<void> showFormOnt(BuildContext context) {
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Wrap(
                                     spacing: 8,
-                                    children: selectedImages.map((img) {
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.file(
-                                          File(img.path),
-                                          width: 70,
-                                          height: 70,
-                                          fit: BoxFit.cover,
-                                        ),
+                                    children: selectedImages.asMap().entries.map((entry) {
+                                      final i = entry.key;
+                                      final img = entry.value;
+                                      return Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              File(img.path),
+                                              width: 70,
+                                              height: 70,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 0,
+                                            top: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setStateDialog(() {
+                                                  selectedImages.removeAt(i);
+                                                });
+                                              },
+                                              child: Container(
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black54,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                padding: const EdgeInsets.all(4),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       );
                                     }).toList(),
                                   ),
                                 ),
+
 
 
 
