@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
@@ -11,6 +13,8 @@ Future<void> showFormOnt(BuildContext context) {
 
   double? selectedLatitude;
   double? selectedLongitude;
+  List<XFile> selectedImages = [];
+
 
   return showDialog(
     context: context,
@@ -84,51 +88,84 @@ Future<void> showFormOnt(BuildContext context) {
 
                       // === ICON ADD PHOTO ===
                       Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color:
-                                AppColors.fourthBase,
-                                borderRadius:
-                                BorderRadius.circular(
-                                    50),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons
-                                      .add_a_photo_outlined,
-                                  size: 30,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final ImagePicker picker = ImagePicker();
+                            final List<XFile> images = await picker.pickMultiImage();
+
+                            if (images.isNotEmpty) {
+                              setStateDialog(() {
+                                if (images.length > 3) {
+                                  selectedImages = images.take(3).toList(); // batasi 3 foto
+                                } else {
+                                  selectedImages = images;
+                                }
+                              });
+                            }
+                          },
+
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: AppColors.fourthBase,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.add_a_photo_outlined,
+                                    size: 30,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Tambahkan foto rumah",
-                              style:
-                              GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight:
-                                FontWeight.w600,
-                                color: Colors.black,
+                              const SizedBox(height: 8),
+                              Text(
+                                "Tambahkan foto rumah",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Foto : 0/3",
-                              style:
-                              GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight:
-                                FontWeight.w500,
-                                color: AppColors
-                                    .textSoftGray,
+                              Text(
+                                "Foto : ${selectedImages.length}/3",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textSoftGray,
+                                ),
                               ),
-                            ),
-                          ],
+
+                              if (selectedImages.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Wrap(
+                                    spacing: 8,
+                                    children: selectedImages.map((img) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          File(img.path),
+                                          width: 70,
+                                          height: 70,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+
+
+
+
+
+                            ],
+                          ),
                         ),
                       ),
+
 
                       const SizedBox(height: 16),
 

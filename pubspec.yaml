@@ -39,6 +39,7 @@ dependencies:
   flutter_map: ^7.0.1             #untuk menggunakan map osm
   latlong2: ^0.9.1                #untuk menggunakan latitude dan longitude
   geolocator: ^13.0.1             #untuk mengambil koordinat GPS
+  image_picker: ^1.1.2            #untuk mengambil gambar
 
 dev_dependencies:
   flutter_test:
