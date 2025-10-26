@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
@@ -16,25 +18,69 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   List<String> provinsiList = [];
   String? selectedProvinsi;
+  bool isOnline = false;
 
   @override
   void initState() {
     super.initState();
-    fetchProvinsi(); // ambil data saat halaman pertama kali dibuka
+    fetchProvinsi();
+    checkConnection();
+
+    // pantau koneksi secara real-time (versi connectivity_plus 6.x.x)
+    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
+      final hasNetwork = await _hasNetworkConnection(results);
+      if (mounted) {
+        setState(() {
+          isOnline = hasNetwork;
+        });
+      }
+    });
   }
 
   // === Ambil daftar provinsi dari API ===
   Future<void> fetchProvinsi() async {
-    final provinsi = await getProvinsi();
-    setState(() {
-      provinsiList = provinsi;
-    });
+    try {
+      final provinsi = await getProvinsi();
+      if (mounted) {
+        setState(() {
+          provinsiList = provinsi;
+        });
+      }
+    } catch (e) {
+      debugPrint("Gagal fetch provinsi: $e");
+    }
+  }
+
+  // === Pastikan benar-benar ada koneksi internet ===
+  Future<bool> _hasNetworkConnection(List<ConnectivityResult> results) async {
+    if (results.isEmpty || results.first == ConnectivityResult.none) {
+      return false;
+    }
+
+    try {
+      final lookup = await InternetAddress.lookup('google.com');
+      return lookup.isNotEmpty && lookup.first.rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // === Cek status koneksi saat halaman pertama kali dibuka ===
+  Future<void> checkConnection() async {
+    final results = await Connectivity().checkConnectivity();
+    final hasNetwork = await _hasNetworkConnection(results);
+    if (mounted) {
+      setState(() {
+        isOnline = hasNetwork;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // background biru bagian atas
         Container(
           width: double.infinity,
           height: 220,
@@ -46,6 +92,8 @@ class _HomePage extends State<HomePage> {
             ),
           ),
         ),
+
+        // konten utama
         Container(
           margin: const EdgeInsets.only(left: 20, right: 20, top: 60),
           child: SingleChildScrollView(
@@ -54,12 +102,13 @@ class _HomePage extends State<HomePage> {
             ),
             child: Column(
               children: [
+                // === STATUS ONLINE / OFFLINE ===
                 Padding(
                   padding: const EdgeInsets.only(left: 10, right: 10),
                   child: Row(
                     children: [
                       Text(
-                        "Anda Offline!",
+                        isOnline ? "Anda Online!" : "Anda Offline",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 28,
@@ -67,10 +116,12 @@ class _HomePage extends State<HomePage> {
                         ),
                       ),
                       const Spacer(),
-                      const Icon(
+                      Icon(
                         Icons.signal_cellular_alt,
                         size: 34,
-                        color: AppColors.signalOff,
+                        color: isOnline
+                            ? AppColors.signalOn
+                            : AppColors.signalOff,
                       ),
                     ],
                   ),
@@ -150,23 +201,22 @@ class _HomePage extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       // === CARD ONT ===
                       buildMenuCard(
-                          icon: Icons.router,
-                          label: "Form ONT",
-                          color: AppColors.secondBase,
-                          onPressed: () => showFormOnt(context)
+                        icon: Icons.router,
+                        label: "Form ONT",
+                        color: AppColors.secondBase,
+                        onPressed: () => showFormOnt(context),
                       ),
 
                       const SizedBox(width: 25),
 
                       // === CARD TIANG ===
                       buildMenuCard(
-                          icon: Icons.wifi,
-                          label: "Form Tiang",
-                          color: AppColors.thirdBase,
-                          onPressed: () => showFormTiang(context)
+                        icon: Icons.wifi,
+                        label: "Form Tiang",
+                        color: AppColors.thirdBase,
+                        onPressed: () => showFormTiang(context),
                       ),
                     ],
                   ),
@@ -218,16 +268,13 @@ class _HomePage extends State<HomePage> {
                 ),
               ],
             ),
-
           ),
-
-
-
         ),
       ],
     );
   }
 
+  // === Widget reusable untuk card menu ===
   static Widget buildMenuCard({
     required IconData icon,
     required String label,
@@ -243,25 +290,23 @@ class _HomePage extends State<HomePage> {
           borderRadius: BorderRadius.circular(16),
         ),
         elevation: 0,
-        fixedSize: const Size(135, 120),
+        fixedSize: const Size(115, 100),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 48),
+          Icon(icon, color: Colors.white, size: 38),
           const SizedBox(height: 8),
           Text(
             label,
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ],
       ),
     );
   }
-
-
 }

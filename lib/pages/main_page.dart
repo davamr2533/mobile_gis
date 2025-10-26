@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/history_page.dart';
 import 'package:gis_mobile/pages/home_page.dart';
@@ -24,6 +25,27 @@ class _MainPage extends State<MainPage> {
     HomePage(),
     HistoryPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    } else if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Izin lokasi ditolak permanen. Silakan aktifkan di pengaturan.'),
+        ),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
