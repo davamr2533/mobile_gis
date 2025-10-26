@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/pages/main_page.dart';
 import 'package:gis_mobile/pages/map_page.dart';
+import 'package:gis_mobile/widgets/pop_up.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
@@ -529,7 +531,26 @@ Future<void> showFormTiang(BuildContext context) {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
+
+                            //Pop Up sesuai koneksi
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const PopUpSuccess()
+                            );
+
+                            Future.delayed(const Duration(seconds: 2), () {
+                              if (context.mounted) {
+                                Navigator.pop(context);
+
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => const MainPage()),
+                                );
+                              }
+                            });
+
+
+
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:

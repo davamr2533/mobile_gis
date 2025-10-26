@@ -13,7 +13,7 @@ class NotificationPage extends StatelessWidget {
         preferredSize: const Size.fromHeight(80),
         child: Container(
           decoration: const BoxDecoration(
-            color: AppColors.firstBase, // ganti sesuai warna yang kamu mau
+            color: AppColors.firstBase,
             borderRadius: BorderRadius.only(
               bottomRight: Radius.circular(50),
             ),

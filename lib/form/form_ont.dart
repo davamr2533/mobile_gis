@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:gis_mobile/pages/main_page.dart';
+import 'package:gis_mobile/widgets/pop_up.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
@@ -520,17 +522,33 @@ Future<void> showFormOnt(BuildContext context) {
                         ],
                       ),
 
-
-
-
-
                       SizedBox(height: 20),
 
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
+
+                            //Pop Up sesuai koneksi
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const PopUpSuccess()
+                            );
+
+                            Future.delayed(const Duration(seconds: 2), () {
+                              if (context.mounted) {
+                                Navigator.pop(context);
+
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => const MainPage()),
+                                );
+                              }
+                            });
+
+
+
+
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
