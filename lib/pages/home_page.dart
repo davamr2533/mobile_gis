@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/form/form_ont.dart';
@@ -19,14 +20,16 @@ class _HomePage extends State<HomePage> {
   List<String> provinsiList = [];
   String? selectedProvinsi;
   bool isOnline = false;
+  bool isGpsOn = false;
 
   @override
   void initState() {
     super.initState();
     fetchProvinsi();
     checkConnection();
+    checkGpsStatus();
 
-    // pantau koneksi secara real-time (versi connectivity_plus 6.x.x)
+    // pantau koneksi secara real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
       final hasNetwork = await _hasNetworkConnection(results);
       if (mounted) {
@@ -35,6 +38,21 @@ class _HomePage extends State<HomePage> {
         });
       }
     });
+
+    // === pantau status GPS secara real-time ===
+    Geolocator.getServiceStatusStream().listen((ServiceStatus status) async {
+      final permission = await Geolocator.checkPermission();
+      final gpsActive = status == ServiceStatus.enabled &&
+          permission != LocationPermission.denied &&
+          permission != LocationPermission.deniedForever;
+
+      if (mounted) {
+        setState(() {
+          isGpsOn = gpsActive;
+        });
+      }
+    });
+
   }
 
   // === Ambil daftar provinsi dari API ===
@@ -75,6 +93,66 @@ class _HomePage extends State<HomePage> {
       });
     }
   }
+
+  // === Cek apakah GPS aktif ===
+  Future<void> checkGpsStatus() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      // Jika GPS belum aktif, tampilkan dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) =>
+              AlertDialog(
+                title: Text(
+                  "Lokasi Tidak Aktif",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                content: Text(
+                  "Silakan aktifkan GPS",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      await Geolocator.openLocationSettings();
+                    },
+                    child: Text(
+                      "Buka Pengaturan",
+                      style: GoogleFonts.urbanist(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        );
+      }
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (mounted) {
+      setState(() {
+        isGpsOn = serviceEnabled &&
+            permission != LocationPermission.denied &&
+            permission != LocationPermission.deniedForever;
+      });
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -163,17 +241,17 @@ class _HomePage extends State<HomePage> {
                                 const SizedBox(height: 10),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.gpsOff,
+                                    color: isGpsOn ? AppColors.gpsOn : AppColors.gpsOff,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   padding: const EdgeInsets.all(8),
                                   child: Center(
                                     child: Text(
-                                      "GPS Offline",
+                                      isGpsOn ? "GPS Aktif" : "GPS Nonaktif",
                                       style: GoogleFonts.poppins(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.textRed,
+                                        color: isGpsOn ? AppColors.textGreen : AppColors.textRed,
                                       ),
                                     ),
                                   ),

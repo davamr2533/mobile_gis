@@ -10,8 +10,10 @@ class AppColors {
   static const Color signalOff = Color(0xFFB3B3B3);
   static const Color signalOn = Color(0xFFFFEC58);
   static const Color gpsOff = Color(0xFFFF9F9F);
+  static const Color gpsOn = Color(0xFFFFE19F);
   static const Color textSoftGray = Color(0xFFA9A9A9);
   static const Color textRed = Color(0xFF9F8D65);
+  static const Color textGreen = Color(0xFF9F8D65);
   static const Color textPending = Color(0xFFFF4747);
   static const Color navBar = Color(0xFF808080);
 
