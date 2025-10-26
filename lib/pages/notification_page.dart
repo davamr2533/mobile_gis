@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/widgets/notification_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationPage extends StatelessWidget {
@@ -34,15 +35,22 @@ class NotificationPage extends StatelessWidget {
         ),
       ),
 
-      body: Center(
-        child: Text(
-          "Belum ada notifikasi",
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSoftGray,
-          ),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+
+              NotificationCard(),
+              NotificationCard(),
+              NotificationCard(),
+
+
+
+            ],
+          )
+        )
+
       ),
     );
   }
