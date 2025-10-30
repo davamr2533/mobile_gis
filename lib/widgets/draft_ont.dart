@@ -167,13 +167,20 @@ class _DraftOntTabState extends State<DraftOntTab> {
                           barrierDismissible: false,
                           builder: (context) => PopUpDelete(
                             onConfirm: () async {
-                              await _deleteDraft(index);
+
+
 
                               showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => PopUpDeleteSuccess()
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => PopUpDeleteSuccess()
                               );
+
+                              await _deleteDraft(index);
+
+
+
+
                             },
                           ),
                         ),
