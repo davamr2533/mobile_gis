@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -23,12 +24,51 @@ class _FormOntPageState extends State<FormOntPage> {
   List<XFile> selectedImages = [];
   String? selectedProv;
   List<String> dialogProvinsi = [];
+  bool isOnline = false;
 
   @override
   void initState() {
     super.initState();
     loadProvinsi();
+    checkConnection();
+
+    // pantau koneksi secara real-time
+    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
+      final hasNetwork = await _hasNetworkConnection(results);
+      if (mounted) {
+        setState(() {
+          isOnline = hasNetwork;
+        });
+      }
+    });
   }
+
+  // === Pastikan benar-benar ada koneksi internet ===
+  Future<bool> _hasNetworkConnection(List<ConnectivityResult> results) async {
+    if (results.isEmpty || results.first == ConnectivityResult.none) {
+      return false;
+    }
+
+    try {
+      final lookup = await InternetAddress.lookup('google.com');
+      return lookup.isNotEmpty && lookup.first.rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // === Cek status koneksi saat halaman pertama kali dibuka ===
+  Future<void> checkConnection() async {
+    final results = await Connectivity().checkConnectivity();
+    final hasNetwork = await _hasNetworkConnection(results);
+    if (mounted) {
+      setState(() {
+        isOnline = hasNetwork;
+      });
+    }
+  }
+
+
 
   Future<void> loadProvinsi() async {
     final provinsi = await getProvinsi();
@@ -473,23 +513,47 @@ class _FormOntPageState extends State<FormOntPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Pop Up sesuai koneksi
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => const PopUpSuccess(),
-                    );
 
-                    Future.delayed(const Duration(seconds: 2), () {
-                      if (context.mounted) {
-                        Navigator.pop(context);
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const MainPage(),
-                          ),
-                        );
-                      }
-                    });
+
+                    if (isOnline) {
+
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => const PopUpSuccess(),
+                      );
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const MainPage(),
+                            ),
+                          );
+                        }
+                      });
+
+                    } else {
+
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => const PopUpDraft(),
+                      );
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const MainPage(),
+                            ),
+                          );
+                        }
+                      });
+
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.thirdBase,
