@@ -40,8 +40,8 @@ dependencies:
   latlong2: ^0.9.1                #untuk menggunakan latitude dan longitude
   geolocator: ^13.0.1             #untuk mengambil koordinat GPS
   image_picker: ^1.1.2            #untuk mengambil gambar
-connectivity_plus: ^6.1.5         #untuk cek koneksi
-shared_preferences: ^2.0.0        #untuk menggunakan shared preferences
+  connectivity_plus: ^6.1.5         #untuk cek koneksi
+  shared_preferences: ^2.0.0        #untuk menggunakan shared preferences
 
 dev_dependencies:
   flutter_test:

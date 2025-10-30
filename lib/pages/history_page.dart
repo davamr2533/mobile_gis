@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/widgets/draft_page.dart';
 import 'package:gis_mobile/widgets/ont_tab_content.dart';
 import 'package:gis_mobile/widgets/tiang_tab_content.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,6 +37,11 @@ class _HistoryPage extends State<HistoryPage> {
           actions: [
             IconButton(
               onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DraftPage()),
+                );
 
               },
               icon: const Icon(
