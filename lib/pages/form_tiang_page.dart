@@ -28,7 +28,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
   List<String> dialogProvinsi = [];
   bool isOnline = false;
 
-  final TextEditingController _ontController = TextEditingController();
+  final TextEditingController _tiangController = TextEditingController();
   final TextEditingController _petugasController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
 
@@ -72,7 +72,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
   // === Simpan draft ke SharedPreferences ===
   Future<List<Map<String, dynamic>>> _readDraftsFromStorage() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('ont_drafts');
+    final raw = prefs.getString('tiang_drafts');
     if (raw == null) return [];
     final List list = jsonDecode(raw);
     return List<Map<String, dynamic>>.from(list);
@@ -82,12 +82,12 @@ class _FormTiangPageState extends State<FormTiangPage> {
     final prefs = await SharedPreferences.getInstance();
     final drafts = await _readDraftsFromStorage();
     drafts.add(draft);
-    await prefs.setString('ont_drafts', jsonEncode(drafts));
+    await prefs.setString('tiang_drafts', jsonEncode(drafts));
   }
 
   // === Tombol Kirim ditekan ===
   Future<void> _onSubmit() async {
-    if (_ontController.text.isEmpty ||
+    if (_tiangController.text.isEmpty ||
         _petugasController.text.isEmpty ||
         _deskripsiController.text.isEmpty ||
         selectedProv == null ||
@@ -124,7 +124,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
 
       final draft = {
         'id': DateTime.now().millisecondsSinceEpoch,
-        'ontNumber': _ontController.text.trim(),
+        'tiangNumber': _tiangController.text.trim(),
         'provinsi': selectedProv,
         'petugas': _petugasController.text.trim(),
         'deskripsi': _deskripsiController.text.trim(),
@@ -159,7 +159,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
           icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("Form ONT", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text("Form Tiang", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         backgroundColor: AppColors.firstBase,
       ),
       body: Padding(
@@ -237,7 +237,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
               ),
               const SizedBox(height: 16),
 
-              _buildTextField("Nomor Tiang", controller: _ontController),
+              _buildTextField("Nomor Tiang", controller: _tiangController),
               const SizedBox(height: 12),
 
               // === PROVINSI ===
