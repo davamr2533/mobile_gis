@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gis_mobile/api/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
-import 'package:gis_mobile/form/form_tiang.dart';
 import 'package:gis_mobile/pages/form_ont_page.dart';
+import 'package:gis_mobile/pages/form_tiang_page.dart';
 import 'package:gis_mobile/widgets/history_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -299,7 +299,12 @@ class _HomePage extends State<HomePage> {
                         icon: Icons.wifi,
                         label: "Form Tiang",
                         color: AppColors.thirdBase,
-                        onPressed: () => showFormTiang(context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const FormTiangPage()),
+                          );
+                        },
                       ),
                     ],
                   ),

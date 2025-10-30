@@ -13,14 +13,14 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class FormOntPage extends StatefulWidget {
-  const FormOntPage({super.key});
+class FormTiangPage extends StatefulWidget {
+  const FormTiangPage({super.key});
 
   @override
-  State<FormOntPage> createState() => _FormOntPageState();
+  State<FormTiangPage> createState() => _FormTiangPageState();
 }
 
-class _FormOntPageState extends State<FormOntPage> {
+class _FormTiangPageState extends State<FormTiangPage> {
   double? selectedLatitude;
   double? selectedLongitude;
   List<XFile> selectedImages = [];
@@ -187,7 +187,7 @@ class _FormOntPageState extends State<FormOntPage> {
                         child: const Center(child: Icon(Icons.add_a_photo_outlined, size: 30)),
                       ),
                       const SizedBox(height: 8),
-                      Text("Tambahkan foto rumah", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                      Text("Tambahkan foto tiang", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                       Text(
                         "Foto : ${selectedImages.length}/3",
                         style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSoftGray),
@@ -237,7 +237,7 @@ class _FormOntPageState extends State<FormOntPage> {
               ),
               const SizedBox(height: 16),
 
-              _buildTextField("Nomor ONT", controller: _ontController),
+              _buildTextField("Nomor Tiang", controller: _ontController),
               const SizedBox(height: 12),
 
               // === PROVINSI ===
@@ -267,7 +267,7 @@ class _FormOntPageState extends State<FormOntPage> {
               _buildTextField("Nama Petugas", controller: _petugasController),
               const SizedBox(height: 12),
 
-              _buildTextField("Deskripsi lokasi rumah", controller: _deskripsiController, maxLines: 2),
+              _buildTextField("Deskripsi lokasi tiang", controller: _deskripsiController, maxLines: 2),
               const SizedBox(height: 8),
               Divider(color: AppColors.textSoftGray, thickness: 1),
               const SizedBox(height: 8),
