@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:gis_mobile/widgets/pop_up.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,21 @@ class _DraftOntTabState extends State<DraftOntTab> {
       });
     }
   }
+
+  Future<void> _deleteDraft(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Hapus draft dari list lokal
+    setState(() {
+      drafts.removeAt(index);
+    });
+
+    // Simpan ulang list draft yang sudah dihapus ke SharedPreferences
+    final encoded = jsonEncode(drafts);
+    await prefs.setString('ont_drafts', encoded);
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -142,17 +158,40 @@ class _DraftOntTabState extends State<DraftOntTab> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.fifthBase,
-                        borderRadius: BorderRadius.circular(5),
+
+                    //Hapus data dari draft
+                    GestureDetector(
+                      onTap: () => {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => PopUpDelete(
+                            onConfirm: () async {
+                              await _deleteDraft(index);
+
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => PopUpDeleteSuccess()
+                              );
+                            },
+                          ),
+                        ),
+
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.fifthBase,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.delete_forever_rounded, color: Colors.red),
+                        ),
                       ),
-                      child: const Center(
-                        child: Icon(Icons.delete_forever_rounded, color: Colors.red),
-                      ),
-                    )
+                    ),
+
                   ],
                 ),
               ],
