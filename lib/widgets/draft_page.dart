@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class DraftPage extends StatefulWidget {
   const DraftPage({super.key});
@@ -14,6 +15,8 @@ class DraftPage extends StatefulWidget {
 
 class _DraftPageState extends State<DraftPage> {
   List<Map<String, dynamic>> drafts = [];
+  List<bool> expandedList = [];
+
 
   @override
   void initState() {
@@ -32,27 +35,31 @@ class _DraftPageState extends State<DraftPage> {
     }
   }
 
-  Future<void> _deleteDraft(int index) async {
-    final prefs = await SharedPreferences.getInstance();
-    drafts.removeAt(index);
-    await prefs.setString('ont_drafts', jsonEncode(drafts));
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
         backgroundColor: AppColors.firstBase,
-        title: Text("Draft Form ONT",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-        centerTitle: true,
+        title: Text(
+          "Draft",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
+        centerTitle: false,
       ),
       body: drafts.isEmpty
           ? Center(
         child: Text(
-          "Belum ada draft tersimpan 💤",
-          style: GoogleFonts.poppins(fontSize: 15),
+          "Belum ada draft tersimpan",
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       )
           : ListView.builder(
@@ -61,89 +68,314 @@ class _DraftPageState extends State<DraftPage> {
         itemBuilder: (context, index) {
           final item = drafts[index];
           final images = item['images'] as List?;
+          final pageController = PageController();
 
           return Card(
+            color: Colors.white,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            elevation: 3,
-            margin: const EdgeInsets.only(bottom: 16),
+              borderRadius: BorderRadiusGeometry.circular(16)
+            ),
+            elevation: 4,
+            margin: EdgeInsetsGeometry.only(bottom: 16),
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsetsGeometry.only(left: 12, right: 12, top: 12, bottom: 8),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // === HEADER ===
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "ONT: ${item['ontNumber'] ?? '-'}",
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600, fontSize: 14),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline,
-                            color: Colors.red),
-                        onPressed: () => _deleteDraft(index),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
 
-                  Text(
-                    "Provinsi: ${item['provinsi'] ?? '-'}",
-                    style: GoogleFonts.poppins(fontSize: 13),
-                  ),
-                  Text(
-                    "Petugas: ${item['petugas'] ?? '-'}",
-                    style: GoogleFonts.poppins(fontSize: 13),
-                  ),
-                  Text(
-                    "Deskripsi: ${item['deskripsi'] ?? '-'}",
-                    style: GoogleFonts.poppins(fontSize: 13),
-                  ),
-                  const SizedBox(height: 6),
-
-                  Text(
-                    "Koordinat: (${item['latitude']?.toStringAsFixed(6) ?? '-'}, "
-                        "${item['longitude']?.toStringAsFixed(6) ?? '-'})",
-                    style: GoogleFonts.poppins(
-                        fontSize: 13, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // === FOTO ===
                   if (images != null && images.isNotEmpty)
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: images.take(3).map<Widget>((base64Img) {
-                        Uint8List bytes = base64Decode(base64Img);
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.memory(
-                            bytes,
-                            width: 80,
-                            height: 80,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        children: [
+
+                          Image.memory(
+                            base64Decode(images.first),
+                            width: double.infinity,
+                            height: 150,
                             fit: BoxFit.cover,
                           ),
-                        );
-                      }).toList(),
+                          Container(
+                            width: double.infinity,
+                            height: 150,
+                            color: Colors.black.withValues(alpha: 0.4),
+                          ),
+
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  "GIS-ID-${item['ontNumber'] ?? '-'}",
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: 80),
+
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  item['provinsi'],
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+
+
+
+                        ],
+                      ),
+                    )
+
+                  else
+                    Container(
+                      width: double.infinity,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: AppColors.fifthBase,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
                     ),
 
-                  const SizedBox(height: 10),
-                  Text(
-                    "Disimpan: ${_formatDate(item['createdAt'])}",
-                    style: GoogleFonts.poppins(
-                        fontSize: 12, color: Colors.grey),
-                  ),
+
+
+
+
+
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+
+                            showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (context) {
+                                  return Dialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadiusGeometry.circular(16)
+                                    ),
+                                    insetPadding: EdgeInsets.all(16),
+                                    child: SingleChildScrollView(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+
+                                            // === Image Carousel ===
+                                            if (images != null && images.isNotEmpty)
+                                              Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 200,
+                                                    child: PageView.builder(
+                                                      controller: pageController,
+                                                      itemCount: images.length,
+                                                      itemBuilder: (context, i) {
+                                                        Uint8List bytes = base64Decode(images[i]);
+                                                        return ClipRRect(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          child: Image.memory(
+                                                            bytes,
+                                                            width: double.infinity,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  SmoothPageIndicator(
+                                                    controller: pageController,
+                                                    count: images.length,
+                                                    effect: ExpandingDotsEffect(
+                                                      dotHeight: 8,
+                                                      dotWidth: 8,
+                                                      spacing: 6,
+                                                      activeDotColor: AppColors.thirdBase,
+                                                      dotColor: Colors.grey.shade300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                            const SizedBox(height: 12),
+
+                                            Align(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                _formatDate(item['createdAt']),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 12),
+
+
+
+                                            _buildDetail("Nomor ONT", "GIS-ID-${item['ontNumber'] ?? '-'}"),
+                                            _buildDetail("Provinsi", item['provinsi']),
+                                            _buildDetail("Petugas", item['petugas']),
+                                            _buildDetail("Deskripsi", item['deskripsi']),
+
+                                            Divider(),
+
+                                            const SizedBox(height: 8),
+
+                                            _coordRow("Latitude   ", "${item['latitude']?.toStringAsFixed(6) ?? '-'}",),
+                                            _coordRow("Longitude", "${item['longitude']?.toStringAsFixed(6) ?? '-'}",),
+
+                                            const SizedBox(height: 8),
+
+                                            SizedBox(
+                                              width: double.infinity,
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  elevation: 0,
+                                                  backgroundColor: AppColors.thirdBase,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                                                ),
+                                                child: Text("Kembali", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            );
+
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: AppColors.thirdBase,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadiusGeometry.only(
+                                  topLeft: Radius.circular(16),
+                                  bottomLeft: Radius.circular(16),
+                                  topRight: Radius.circular(5),
+                                  bottomRight: Radius.circular(5),
+                                )
+                            ),
+                          ),
+                          child: Text(
+                            "Cek Detail",
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600
+                            )
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(width: 8),
+
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: AppColors.fifthBase,
+                            borderRadius: BorderRadiusGeometry.circular(5)
+                        ),
+                        child: Center(
+                          child: Icon(Icons.delete_forever_rounded, color: Colors.red),
+                        ),
+                      )
+
+                    ],
+                  )
+
+
                 ],
-              ),
+              )
+
+
+              
+              
             ),
           );
+
+
         },
       ),
     );
+  }
+
+  //container detail warna cream
+  Widget _buildDetail (String label, String? value) {
+    return Container(
+      width: double.infinity,
+      height: 45,
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+          color: AppColors.fifthBase,
+          borderRadius: BorderRadius.circular(12)
+      ),
+      child: Text(
+        "$value",
+        style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: AppColors.textDarkGray
+        ),
+      ),
+    );
+  }
+
+
+  //container untuk koordinat
+  Widget _coordRow(String label, String? value) {
+    return Padding(
+      padding: EdgeInsetsGeometry.only(bottom: 8),
+      child: Row(
+        children: [
+          Text(label, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.only(left: 8),
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.textSoftGray),
+              ),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "$value",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
   }
 
   String _formatDate(String? isoDate) {
