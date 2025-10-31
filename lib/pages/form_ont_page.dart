@@ -2,16 +2,19 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
-import 'package:gis_mobile/widgets/pop_up/pop_up.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_draft.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:gis_mobile/api/services/get_provinsi.dart';
+import 'package:gis_mobile/api/services/get/get_provinsi.dart';
 import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class FormOntPage extends StatefulWidget {
   const FormOntPage({super.key});
@@ -94,6 +97,7 @@ class _FormOntPageState extends State<FormOntPage> {
         selectedImages.isEmpty ||
         selectedLatitude == null ||
         selectedLongitude == null) {
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Lengkapi semua data sebelum kirim ya 😄")),
       );
@@ -102,6 +106,66 @@ class _FormOntPageState extends State<FormOntPage> {
 
     if (isOnline) {
       // === ONLINE ===
+      try {
+        // Ubah 3 foto pertama jadi File
+        final File foto1 = File(selectedImages[0].path);
+        final File foto2 = File(selectedImages[1].path);
+        final File foto3 = File(selectedImages[2].path);
+
+        // Tampilkan indikator loading biar UX-nya smooth
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Kirim data ke server
+        bool success = await OntPostService.postDataOnt(
+          nomorOnt: _ontController.text.trim(),
+          area: selectedProv!, // dari dropdown
+          deskripsiRumah: _deskripsiController.text.trim(),
+          fotoOnt1: foto1,
+          fotoOnt2: foto2,
+          fotoOnt3: foto3,
+          latitude: selectedLatitude!.toString(),
+          longitude: selectedLongitude!.toString(),
+          namaPetugas: _petugasController.text.trim(),
+          status: "Pending",
+        );
+
+        // Tutup loading dialog
+        Navigator.pop(context);
+
+        if (success) {
+          // ✅ Jika sukses
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const PopUpSuccess(),
+          );
+
+          Future.delayed(const Duration(seconds: 2), () {
+            if (context.mounted) {
+              Navigator.pop(context); // tutup popup
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+            }
+          });
+        } else {
+          // ❌ Jika gagal
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Gagal kirim data ke server 😢")),
+          );
+        }
+      } catch (e) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Terjadi error: $e")),
+        );
+      }
+
+
+
+
       showDialog(
         context: context,
         barrierDismissible: false,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/models/tiang_model.dart';
-import 'package:gis_mobile/api/services/get_data_tiang.dart';
+import 'package:gis_mobile/api/services/get/get_data_tiang.dart';
 import 'package:gis_mobile/widgets/cards/history_tiang_card.dart';
 
 class TiangTabContent extends StatefulWidget {
@@ -55,14 +55,11 @@ class _TiangTabContent extends State<TiangTabContent> {
                   // Tentukan warna status
                   Color statusColor;
                   switch (tiang.status.toLowerCase()) {
-                    case 'progress':
+                    case 'pending':
                       statusColor = Colors.orange;
                       break;
                     case 'verified':
                       statusColor = Colors.green;
-                      break;
-                    case 'pending':
-                      statusColor = Colors.yellow;
                       break;
                     default:
                       statusColor = Colors.grey;

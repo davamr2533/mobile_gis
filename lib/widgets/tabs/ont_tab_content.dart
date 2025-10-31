@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/models/ont_model.dart';
-import 'package:gis_mobile/api/services/get_data_ont.dart';
+import 'package:gis_mobile/api/services/get/get_data_ont.dart';
 import 'package:gis_mobile/widgets/cards/history_ont_card.dart';
 
 class OntTabContent extends StatefulWidget {
@@ -55,14 +55,11 @@ class _OntTabContent extends State<OntTabContent> {
                 // Tentukan warna status
                 Color statusColor;
                 switch (ont.status.toLowerCase()) {
-                  case 'progress':
+                  case 'pending':
                     statusColor = Colors.orange;
                     break;
                   case 'verified':
                     statusColor = Colors.green;
-                    break;
-                  case 'pending':
-                    statusColor = Colors.yellow;
                     break;
                   default:
                     statusColor = Colors.grey;

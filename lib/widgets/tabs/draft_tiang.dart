@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:gis_mobile/widgets/pop_up/pop_up.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
