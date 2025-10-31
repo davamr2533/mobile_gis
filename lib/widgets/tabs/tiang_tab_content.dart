@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/models/tiang_model.dart';
 import 'package:gis_mobile/api/services/get/get_data_tiang.dart';
 import 'package:gis_mobile/widgets/cards/history_tiang_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TiangTabContent extends StatefulWidget {
   const TiangTabContent({super.key});
@@ -37,8 +38,15 @@ class _TiangTabContent extends State<TiangTabContent> {
 
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             // Data kosong
-            return const Center(
-              child: Text('Tidak ada data Tiang ditemukan.'),
+            return Center(
+              child: Text(
+                'Tidak ada data Tiang ditemukan.',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black54,
+                  fontSize: 16
+                ),
+              ),
             );
 
           } else {

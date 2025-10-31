@@ -112,7 +112,7 @@ class _FormOntPageState extends State<FormOntPage> {
         final File foto2 = File(selectedImages[1].path);
         final File foto3 = File(selectedImages[2].path);
 
-        // Tampilkan indikator loading biar UX-nya smooth
+        // Tampilkan indikator loading
         showDialog(
           context: context,
           barrierDismissible: false,

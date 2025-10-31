@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:gis_mobile/api/services/post/post_data_tiang.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_draft.dart';
@@ -103,6 +104,64 @@ class _FormTiangPageState extends State<FormTiangPage> {
 
     if (isOnline) {
       // === ONLINE ===
+      try {
+        // Ubah 3 foto pertama jadi File
+        final File foto1 = File(selectedImages[0].path);
+        final File foto2 = File(selectedImages[1].path);
+        final File foto3 = File(selectedImages[2].path);
+
+        // Tampilkan indikator loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Kirim data ke server
+        bool success = await TiangPostService.postDataTiang(
+          nomorTiang: _tiangController.text.trim(),
+          area: selectedProv!, // dari dropdown
+          deskripsiTiang: _deskripsiController.text.trim(),
+          fotoTiang1: foto1,
+          fotoTiang2: foto2,
+          fotoTiang3: foto3,
+          latitude: selectedLatitude!.toString(),
+          longitude: selectedLongitude!.toString(),
+          namaPetugas: _petugasController.text.trim(),
+          status: "Pending",
+        );
+
+        // Tutup loading dialog
+        Navigator.pop(context);
+
+        if (success) {
+          // ✅ Jika sukses
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const PopUpSuccess(),
+          );
+
+          Future.delayed(const Duration(seconds: 2), () {
+            if (context.mounted) {
+              Navigator.pop(context); // tutup popup
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+            }
+          });
+        } else {
+          // ❌ Jika gagal
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Gagal kirim data ke server 😢")),
+          );
+        }
+      } catch (e) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Terjadi error: $e")),
+        );
+      }
+
+
       showDialog(
         context: context,
         barrierDismissible: false,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:gis_mobile/api/services/get/get_data_ont.dart';
 import 'package:gis_mobile/widgets/cards/history_ont_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OntTabContent extends StatefulWidget {
   const OntTabContent({super.key});
@@ -37,8 +38,15 @@ class _OntTabContent extends State<OntTabContent> {
 
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             // Data kosong
-            return const Center(
-              child: Text('Tidak ada data ONT ditemukan.'),
+            return Center(
+              child: Text(
+                'Tidak ada data ONT ditemukan.',
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black54,
+                    fontSize: 16
+                ),
+              ),
             );
 
           } else {
