@@ -224,6 +224,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   if (images != null && images.isNotEmpty)
                     Column(
                       children: [
@@ -255,6 +256,10 @@ class _DraftOntTabState extends State<DraftOntTab> {
                         ),
                       ],
                     ),
+
+
+
+
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.center,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/widgets/cards/detail_ont_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HistoryOntCard extends StatelessWidget {
@@ -103,6 +104,12 @@ class HistoryOntCard extends StatelessWidget {
                         shadowColor: WidgetStateColor.transparent
                     ),
                     onPressed: () {
+
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => DetailOntCard(ont: ont),
+                      );
 
                     },
                     child: Text(
