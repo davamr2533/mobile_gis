@@ -414,9 +414,7 @@ class _HomePage extends State<HomePage> {
                       if (status.toLowerCase() == "verified") {
                         sideColor = AppColors.secondBase;
                       } else if (status.toLowerCase() == "pending") {
-                        sideColor = Colors.orange;
-                      } else if (status.toLowerCase() == "rejected") {
-                        sideColor = Colors.red;
+                        sideColor = AppColors.thirdBase;
                       }
 
                       return HistoryCard(
