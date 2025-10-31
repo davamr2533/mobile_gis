@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:gis_mobile/api/services/get/get_data_ont.dart';
+import 'package:gis_mobile/api/services/get/get_data_tiang.dart';
 import 'package:gis_mobile/api/services/get/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/form_ont_page.dart';
@@ -18,9 +20,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   List<String> provinsiList = [];
+  List<Map<String, dynamic>> ontHistory = [];
   String? selectedProvinsi;
   bool isOnline = false;
   bool isGpsOn = false;
+  bool isLoadingHistory = true;
 
   @override
   void initState() {
@@ -28,6 +32,7 @@ class _HomePage extends State<HomePage> {
     fetchProvinsi();
     checkConnection();
     checkGpsStatus();
+    fetchAllHistory();
 
     // pantau koneksi secara real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
@@ -68,6 +73,57 @@ class _HomePage extends State<HomePage> {
       debugPrint("Gagal fetch provinsi: $e");
     }
   }
+
+  Future<void> fetchAllHistory() async {
+    try {
+      final ontData = await OntService.fetchDataOnt();
+      final tiangData = await TiangService.fetchDataTiang();
+
+
+      final combined = [
+        ...ontData.map((ont) => {
+          'id': ont.id,
+          'nomor': ont.nomorOnt,
+          'lokasi': ont.area,
+          'status': ont.status,
+          'jenis': 'ONT', // label asal tabel
+          'created_at': ont.createdAt,
+        }),
+        ...tiangData.map((tiang) => {
+          'id': tiang.id,
+          'nomor': tiang.nomorTiang,
+          'lokasi': tiang.area,
+          'status': tiang.status,
+          'jenis': 'TIANG',
+          'created_at': tiang.createdAt,
+        }),
+      ];
+
+
+      combined.sort((a, b) {
+        final dateA = DateTime.tryParse((a['created_at'] ?? '').toString()) ?? DateTime(1970);
+        final dateB = DateTime.tryParse((b['created_at'] ?? '').toString()) ?? DateTime(1970);
+        return dateB.compareTo(dateA);
+      });
+
+
+      if (mounted) {
+        setState(() {
+          ontHistory = combined.take(3).toList(); // ambil 3 terbaru
+          isLoadingHistory = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Gagal ambil data history gabungan: $e");
+      if (mounted) {
+        setState(() {
+          isLoadingHistory = false;
+        });
+      }
+    }
+  }
+
+
 
   // === Pastikan benar-benar ada koneksi internet ===
   Future<bool> _hasNetworkConnection(List<ConnectivityResult> results) async {
@@ -338,22 +394,43 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const HistoryCard(
-                  id: "GIS-ONT-1224",
-                  location: "Yogyakarta",
-                  status: "Pending",
-                ),
-                const HistoryCard(
-                  id: "GIS-ONT-1234",
-                  location: "Surakarta",
-                  status: "Pending",
-                ),
-                const HistoryCard(
-                  id: "GIS-ONT-2255",
-                  location: "Jakarta",
-                  status: "Verified",
-                  sideColor: AppColors.secondBase,
-                ),
+
+                if (isLoadingHistory)
+                  const Center(child: CircularProgressIndicator())
+                else if (ontHistory.isEmpty)
+                  Text(
+                    "Belum ada data ONT",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                  )
+                else
+                  Column(
+                    children: ontHistory.map((item) {
+                      final status = (item['status'] ?? '').toString();
+                      final nomor = (item['nomor'] ?? '').toString();
+                      final lokasi = (item['lokasi'] ?? '').toString();
+                      final jenis = (item['jenis'] ?? '').toString();
+
+                      Color sideColor = Colors.grey;
+                      if (status.toLowerCase() == "verified") {
+                        sideColor = AppColors.secondBase;
+                      } else if (status.toLowerCase() == "pending") {
+                        sideColor = Colors.orange;
+                      } else if (status.toLowerCase() == "rejected") {
+                        sideColor = Colors.red;
+                      }
+
+                      return HistoryCard(
+                        id: nomor.toString(),
+                        location: lokasi.toString(),
+                        status: "$jenis - $status",
+                        sideColor: sideColor,
+                      );
+                    }).toList(),
+                  )
+
+
+
+
               ],
             ),
           ),
