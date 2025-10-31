@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/draft_page.dart';
-import 'package:gis_mobile/widgets/ont_tab_content.dart';
-import 'package:gis_mobile/widgets/tiang_tab_content.dart';
+import 'package:gis_mobile/widgets/tabs/ont_tab_content.dart';
+import 'package:gis_mobile/widgets/tabs/tiang_tab_content.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HistoryPage extends StatefulWidget {

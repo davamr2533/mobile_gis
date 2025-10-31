@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
-import 'package:gis_mobile/widgets/notification_card.dart';
+import 'package:gis_mobile/widgets/cards/notification_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationPage extends StatelessWidget {

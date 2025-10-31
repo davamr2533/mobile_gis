@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HistoryTabCard extends StatelessWidget {
-  final String id;
-  final String location;
-  final String status;
+class HistoryOntCard extends StatelessWidget {
+  final OntModel ont;
   final Color statusColor;
 
-  const HistoryTabCard({super.key,
-    required this.id,
-    required this.location,
-    required this.status,
-    required this.statusColor,
+  const HistoryOntCard({
+    super.key,
+    required this.ont,
+    required this.statusColor
+
   });
 
   @override
@@ -44,11 +43,11 @@ class HistoryTabCard extends StatelessWidget {
                     ),
                     child: ColorFiltered(
                       colorFilter: ColorFilter.mode(
-                        Colors.black.withValues(alpha: 0.2),
+                        Colors.black.withValues(alpha: 0.4),
                         BlendMode.darken,
                       ),
-                      child: Image.asset(
-                        'assets/tiang_sample.webp',
+                      child: Image.network(
+                        'http://202.169.231.66:82${ont.fotoOnt1}',
                         width: double.infinity,
                         height: 100,
                         fit: BoxFit.cover,
@@ -62,7 +61,7 @@ class HistoryTabCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "25-10-2025",
+                        ont.createdAt.split(' ')[0],
                         style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             fontSize: 13,
@@ -73,7 +72,7 @@ class HistoryTabCard extends StatelessWidget {
                       SizedBox(height: 45),
 
                       Text(
-                        id,
+                        "GIS-ID-${ont.nomorOnt}",
                         style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             fontSize: 13,
@@ -120,7 +119,7 @@ class HistoryTabCard extends StatelessWidget {
 
 
                 Text(
-                  status,
+                  ont.status,
                   style: GoogleFonts.poppins(
                     color: statusColor,
                     fontWeight: FontWeight.w600,

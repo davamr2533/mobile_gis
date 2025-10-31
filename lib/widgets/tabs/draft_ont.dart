@@ -1,20 +1,20 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:gis_mobile/widgets/pop_up.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class DraftTiangTab extends StatefulWidget {
-  const DraftTiangTab({super.key});
+class DraftOntTab extends StatefulWidget {
+  const DraftOntTab({super.key});
 
   @override
-  State<DraftTiangTab> createState() => _DraftTiangTabState();
+  State<DraftOntTab> createState() => _DraftOntTabState();
 }
 
-class _DraftTiangTabState extends State<DraftTiangTab> {
+class _DraftOntTabState extends State<DraftOntTab> {
   List<Map<String, dynamic>> drafts = [];
 
   @override
@@ -25,7 +25,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
 
   Future<void> _loadDrafts() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('tiang_drafts');
+    final raw = prefs.getString('ont_drafts');
     if (raw != null) {
       final List list = jsonDecode(raw);
       setState(() {
@@ -44,16 +44,17 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
 
     // Simpan ulang list draft yang sudah dihapus ke SharedPreferences
     final encoded = jsonEncode(drafts);
-    await prefs.setString('tiang_drafts', encoded);
+    await prefs.setString('ont_drafts', encoded);
 
   }
+
 
   @override
   Widget build(BuildContext context) {
     if (drafts.isEmpty) {
       return Center(
         child: Text(
-          "Belum ada draft Tiang tersimpan",
+          "Belum ada draft ONT tersimpan",
           style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
         ),
       );
@@ -98,7 +99,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                             Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                "GIS-ID-${item['tiangNumber'] ?? '-'}",
+                                "GIS-ID-${item['ontNumber'] ?? '-'}",
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -158,7 +159,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                     ),
                     const SizedBox(width: 8),
 
-
                     //Hapus data dari draft
                     GestureDetector(
                       onTap: () => {
@@ -167,15 +167,24 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                           barrierDismissible: false,
                           builder: (context) => PopUpDelete(
                             onConfirm: () async {
+
+
+
                               showDialog(
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (context) => PopUpDeleteSuccess()
                               );
+
                               await _deleteDraft(index);
+
+
+
+
                             },
                           ),
                         ),
+
                       },
                       child: Container(
                         width: 40,
@@ -189,10 +198,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                         ),
                       ),
                     ),
-
-
-
-
 
                   ],
                 ),
@@ -262,7 +267,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildDetail("Nomor Tiang", "GIS-ID-${item['tiangNumber'] ?? '-'}"),
+                  _buildDetail("Nomor ONT", "GIS-ID-${item['ontNumber'] ?? '-'}"),
                   _buildDetail("Provinsi", item['provinsi']),
                   _buildDetail("Petugas", item['petugas']),
                   _buildDetail("Deskripsi", item['deskripsi']),

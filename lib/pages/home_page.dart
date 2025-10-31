@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:gis_mobile/api/get_provinsi.dart';
+import 'package:gis_mobile/api/services/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/form_ont_page.dart';
 import 'package:gis_mobile/pages/form_tiang_page.dart';
-import 'package:gis_mobile/widgets/history_card.dart';
+import 'package:gis_mobile/widgets/cards/history_home_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {

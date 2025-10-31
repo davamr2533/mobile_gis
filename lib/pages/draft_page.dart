@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gis_mobile/widgets/draft_ont.dart';
-import 'package:gis_mobile/widgets/draft_tiang.dart';
+import 'package:gis_mobile/widgets/tabs/draft_ont.dart';
+import 'package:gis_mobile/widgets/tabs/draft_tiang.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 
