@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class DraftOntTab extends StatefulWidget {
   const DraftOntTab({super.key});
@@ -24,6 +27,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
     _loadDrafts();
   }
 
+  //fungsi untuk ambil data draft dari shared preferences
   Future<void> _loadDrafts() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString('ont_drafts');
@@ -35,20 +39,113 @@ class _DraftOntTabState extends State<DraftOntTab> {
     }
   }
 
+  //fungsi untuk hapus data di draft jika berhasil upload
   Future<void> _deleteDraft(int index) async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Hapus draft dari list lokal
     setState(() {
       drafts.removeAt(index);
     });
-
-    // Simpan ulang list draft yang sudah dihapus ke SharedPreferences
-    final encoded = jsonEncode(drafts);
-    await prefs.setString('ont_drafts', encoded);
-
+    await prefs.setString('ont_drafts', jsonEncode(drafts));
   }
 
+  //fungsi untuk compress ukuran gambar
+  Future<File> _compressImage(Uint8List bytes) async {
+    final tempDir = Directory.systemTemp;
+    final tempFile = File(
+      '${tempDir.path}/temp_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
+    await tempFile.writeAsBytes(bytes);
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      tempFile.path,
+      '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      quality: 80,
+    );
+
+    if (result != null) {
+      // ubah XFile -> File
+      return File(result.path);
+    } else {
+      return tempFile;
+    }
+  }
+
+
+  //Fungsi untuk upload data dari draft ke server
+  Future<void> _uploadToServer(Map<String, dynamic> item, List? images, int index) async {
+    try {
+      if (images == null || images.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gambar tidak tersedia")),
+        );
+        return;
+      }
+
+      // Tampilkan loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Kompres semua gambar base64
+      List<String> compressedBase64 = [];
+      for (var img in images) {
+        Uint8List bytes = base64Decode(img);
+        File compressed = await _compressImage(bytes);
+        compressedBase64.add(base64Encode(await compressed.readAsBytes()));
+      }
+
+      // Kirim ke API
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse("http://202.169.231.66:82/api/v1/gis/post-data-ont"),
+      );
+
+      // Field
+      request.fields.addAll({
+        "nomor_ont": item['ontNumber'],
+        "area": item['provinsi'],
+        "deskripsi_rumah": item['deskripsi'],
+        "latitude": item['latitude'].toString(),
+        "longitude": item['longitude'].toString(),
+        "nama_petugas": item['petugas'],
+        "status": "Pending",
+      });
+
+      // File dari base64
+      for (int i = 0; i < images.length; i++) {
+        Uint8List bytes = base64Decode(images[i]);
+        final tempDir = Directory.systemTemp;
+        final file = await File('${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg').writeAsBytes(bytes);
+        request.files.add(await http.MultipartFile.fromPath('foto_ont_${i + 1}', file.path));
+      }
+
+      // Kirim request
+      final response = await request.send();
+
+      Navigator.pop(context); // tutup loading
+
+      if (response.statusCode == 200) {
+        await _deleteDraft(index);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const PopUpDeleteSuccess(),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal upload: ${response.statusCode}")),
+        );
+      }
+
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +236,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => _showDetailDialog(context, item, images, pageController),
+                        onPressed: () => _showDetailDialog(context, item, images, pageController, index),
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           backgroundColor: AppColors.thirdBase,
@@ -159,8 +256,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
                       ),
                     ),
                     const SizedBox(width: 8),
-
-                    //Hapus data dari draft
                     GestureDetector(
                       onTap: () => {
                         showDialog(
@@ -168,24 +263,15 @@ class _DraftOntTabState extends State<DraftOntTab> {
                           barrierDismissible: false,
                           builder: (context) => PopUpDelete(
                             onConfirm: () async {
-
-
-
                               showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (context) => PopUpDeleteSuccess()
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const PopUpDeleteSuccess(),
                               );
-
                               await _deleteDraft(index);
-
-
-
-
                             },
                           ),
                         ),
-
                       },
                       child: Container(
                         width: 40,
@@ -199,7 +285,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ],
@@ -210,7 +295,8 @@ class _DraftOntTabState extends State<DraftOntTab> {
     );
   }
 
-  void _showDetailDialog(BuildContext context, Map<String, dynamic> item, List? images, PageController pageController) {
+  void _showDetailDialog(
+      BuildContext context, Map<String, dynamic> item, List? images, PageController pageController, int index) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -224,7 +310,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   if (images != null && images.isNotEmpty)
                     Column(
                       children: [
@@ -256,10 +341,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
                         ),
                       ],
                     ),
-
-
-
-
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.center,
@@ -285,14 +366,32 @@ class _DraftOntTabState extends State<DraftOntTab> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
+                      onPressed: () => _uploadToServer(item, images, index),
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                      ),
+                      child: Text(
+                        "Upload ke Server",
+                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: AppColors.thirdBase,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                       ),
-                      child: Text("Kembali",
-                          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                      child: Text(
+                        "Kembali",
+                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ],
