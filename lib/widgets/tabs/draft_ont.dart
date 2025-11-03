@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -39,7 +40,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
     }
   }
 
-  //fungsi untuk hapus data di draft jika berhasil upload
+  //fungsi untuk hapus data di draft
   Future<void> _deleteDraft(int index) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -131,7 +132,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const PopUpDeleteSuccess(),
+          builder: (context) => const PopUpSuccess(),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -256,6 +257,8 @@ class _DraftOntTabState extends State<DraftOntTab> {
                       ),
                     ),
                     const SizedBox(width: 8),
+
+                    //Hapus data dari draft
                     GestureDetector(
                       onTap: () => {
                         showDialog(
@@ -273,6 +276,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
                           ),
                         ),
                       },
+
                       child: Container(
                         width: 40,
                         height: 40,
@@ -363,6 +367,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
                   _coordRow("Latitude", "${item['latitude']?.toStringAsFixed(6) ?? '-'}"),
                   _coordRow("Longitude", "${item['longitude']?.toStringAsFixed(6) ?? '-'}"),
                   const SizedBox(height: 8),
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -373,12 +378,14 @@ class _DraftOntTabState extends State<DraftOntTab> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                       ),
                       child: Text(
-                        "Upload ke Server",
+                        "Kirim Ulang",
                         style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+
+                  const SizedBox(height: 4),
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
