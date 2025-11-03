@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class DraftOntTab extends StatefulWidget {
   const DraftOntTab({super.key});
@@ -43,59 +42,16 @@ class _DraftOntTabState extends State<DraftOntTab> {
   //fungsi untuk hapus data di draft
   Future<void> _deleteDraft(int index) async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Hapus draft dari list lokal
     setState(() {
       drafts.removeAt(index);
     });
-    await prefs.setString('ont_drafts', jsonEncode(drafts));
+
+    // Simpan ulang list draft yang sudah dihapus ke SharedPreferences
+    final encoded = jsonEncode(drafts);
+    await prefs.setString('ont_drafts', encoded);
   }
-
-  // ✅ fungsi untuk compress file ke 200kb
-  Future<XFile> _compressIfNeeded(XFile file) async {
-    final original = File(file.path);
-    final size = await original.length();
-
-    if (size <= 200 * 1024) {
-      // jika ukuran foto dibawah 200 kb langsung upload
-      return file;
-    }
-
-    final filePath = original.absolute.path;
-    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
-    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
-
-    int quality = 80;
-    File? compressed;
-
-    // Kompres terus sampai < 200 KB
-    do {
-      final result = await FlutterImageCompress.compressAndGetFile(
-        original.path,
-        outPath,
-        quality: quality,
-      );
-      compressed = result != null ? File(result.path) : null;
-      quality -= 10;
-    } while (compressed != null &&
-        await compressed.length() > 200 * 1024 &&
-        quality > 10);
-
-    return XFile(compressed!.path);
-  }
-
-  // 🔧 fungsi compress image dari byte base64
-  Future<File> _compressImage(Uint8List bytes) async {
-    final tempDir = Directory.systemTemp;
-    final tempFile = File(
-      '${tempDir.path}/temp_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
-    );
-    await tempFile.writeAsBytes(bytes);
-
-    // Gunakan fungsi _compressIfNeeded
-    XFile compressedXFile = await _compressIfNeeded(XFile(tempFile.path));
-
-    return File(compressedXFile.path);
-  }
-
 
   //Fungsi untuk upload data dari draft ke server
   Future<void> _uploadToServer(Map<String, dynamic> item, List? images, int index) async {
@@ -111,49 +67,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 12),
-              Text(
-                "Mengompres gambar...",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w500
-                ),
-              )
-            ],
-          )
-        ),
-      );
-
-      // Kompres semua gambar base64
-      List<String> compressedBase64 = [];
-      for (var img in images) {
-        Uint8List bytes = base64Decode(img);
-        File compressed = await _compressImage(bytes);
-        compressedBase64.add(base64Encode(await compressed.readAsBytes()));
-      }
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 12),
-              Text(
-                "Mengunggah data ke server...",
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500
-                ),
-              )
-            ],
-          ),
-        ),
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
 
       // Kirim ke API
@@ -173,19 +87,18 @@ class _DraftOntTabState extends State<DraftOntTab> {
         "status": "Pending",
       });
 
-      // File hasil compress
-      for (int i = 0; i < compressedBase64.length; i++) {
-        Uint8List bytes = base64Decode(compressedBase64[i]);
+      // Kirim file langsung dari base64 (tanpa kompres)
+      for (int i = 0; i < images.length; i++) {
+        Uint8List bytes = base64Decode(images[i]);
         final tempDir = Directory.systemTemp;
-        final file = await File(
-          '${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg',
-        ).writeAsBytes(bytes);
-        request.files
-            .add(await http.MultipartFile.fromPath('foto_ont_${i + 1}', file.path));
+        final file = await File('${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg')
+            .writeAsBytes(bytes);
+        request.files.add(await http.MultipartFile.fromPath('foto_ont_${i + 1}', file.path));
       }
 
       // Kirim request
       final response = await request.send();
+
       Navigator.pop(context); // tutup loading
 
       if (response.statusCode == 200) {
@@ -360,8 +273,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
     );
   }
 
-  void _showDetailDialog(
-      BuildContext context, Map<String, dynamic> item, List? images, PageController pageController, int index) {
+  void _showDetailDialog(BuildContext context, Map<String, dynamic> item, List? images, PageController pageController, int index) {
     showDialog(
       context: context,
       barrierDismissible: true,

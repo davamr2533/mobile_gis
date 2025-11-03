@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
@@ -54,29 +53,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
     await prefs.setString('tiang_drafts', encoded);
   }
 
-  //fungsi untuk compress ukuran gambar
-  Future<File> _compressImage(Uint8List bytes) async {
-    final tempDir = Directory.systemTemp;
-    final tempFile = File(
-      '${tempDir.path}/temp_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
-    );
-    await tempFile.writeAsBytes(bytes);
-
-    final result = await FlutterImageCompress.compressAndGetFile(
-      tempFile.path,
-      '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg',
-      quality: 80,
-    );
-
-    if (result != null) {
-      // ubah XFile -> File
-      return File(result.path);
-    } else {
-      return tempFile;
-    }
-  }
-
-
   //Fungsi untuk upload data dari draft ke server
   Future<void> _uploadToServer(Map<String, dynamic> item, List? images, int index) async {
     try {
@@ -93,14 +69,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         barrierDismissible: false,
         builder: (_) => const Center(child: CircularProgressIndicator()),
       );
-
-      // Kompres semua gambar base64
-      List<String> compressedBase64 = [];
-      for (var img in images) {
-        Uint8List bytes = base64Decode(img);
-        File compressed = await _compressImage(bytes);
-        compressedBase64.add(base64Encode(await compressed.readAsBytes()));
-      }
 
       // Kirim ke API
       final request = http.MultipartRequest(
@@ -119,11 +87,12 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         "status": "Pending",
       });
 
-      // File dari base64
+      // Kirim file langsung dari base64 (tanpa kompres)
       for (int i = 0; i < images.length; i++) {
         Uint8List bytes = base64Decode(images[i]);
         final tempDir = Directory.systemTemp;
-        final file = await File('${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg').writeAsBytes(bytes);
+        final file = await File('${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg')
+            .writeAsBytes(bytes);
         request.files.add(await http.MultipartFile.fromPath('foto_tiang_${i + 1}', file.path));
       }
 
@@ -152,8 +121,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +231,6 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                       ),
                     ),
                     const SizedBox(width: 8),
-
 
                     //Hapus data dari draft
                     GestureDetector(
@@ -402,8 +368,10 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                         backgroundColor: AppColors.thirdBase,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                       ),
-                      child: Text("Kembali",
-                          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                      child: Text(
+                          "Kembali",
+                          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)
+                      ),
                     ),
                   ),
                 ],
