@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -14,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 class FormOntPage extends StatefulWidget {
@@ -137,7 +139,7 @@ class _FormOntPageState extends State<FormOntPage> {
         Navigator.pop(context);
 
         if (success) {
-          // ✅ Jika sukses
+
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -150,11 +152,13 @@ class _FormOntPageState extends State<FormOntPage> {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
             }
           });
+
         } else {
-          // ❌ Jika gagal
+
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Gagal kirim data ke server 😢")),
+            const SnackBar(content: Text("Gagal kirim data ke server")),
           );
+
         }
       } catch (e) {
         Navigator.pop(context);
@@ -164,20 +168,6 @@ class _FormOntPageState extends State<FormOntPage> {
       }
 
 
-
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const PopUpSuccess(),
-      );
-
-      Future.delayed(const Duration(seconds: 2), () {
-        if (context.mounted) {
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
-        }
-      });
     } else {
       // === OFFLINE: Simpan ke draft ===
       final List<String> base64Images = [];
@@ -387,6 +377,41 @@ class _FormOntPageState extends State<FormOntPage> {
     );
   }
 
+
+  //fungsi untuk compress file
+  Future<XFile> _compressIfNeeded(XFile file) async {
+    final original = File(file.path);
+    final size = await original.length();
+
+    if (size <= 500 * 1024) {
+      // jika ukuran foto dibawah 500 kb langsung upload
+      return file;
+    }
+
+    final filePath = original.absolute.path;
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
+
+    int quality = 80;
+    File? compressed;
+
+    // Kompres terus sampai < 500 KB
+    do {
+      final result = await FlutterImageCompress.compressAndGetFile(
+        original.path,
+        outPath,
+        quality: quality,
+      );
+      compressed = result != null ? File(result.path) : null;
+      quality -= 10;
+    } while (compressed != null && await compressed.length() > 500 * 1024 && quality > 10);
+
+
+
+    return XFile(compressed!.path);
+  }
+
+
   Future<void> _pickImageOptions() async {
     showModalBottomSheet(
       context: context,
@@ -405,7 +430,8 @@ class _FormOntPageState extends State<FormOntPage> {
                   final ImagePicker picker = ImagePicker();
                   final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
                   if (photo != null && selectedImages.length < 3) {
-                    setState(() => selectedImages.add(photo));
+                    final compressed = await _compressIfNeeded(photo);
+                    setState(() => selectedImages.add(compressed));
                   }
                 },
               ),
@@ -417,13 +443,16 @@ class _FormOntPageState extends State<FormOntPage> {
                   final ImagePicker picker = ImagePicker();
                   final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
                   if (images.isNotEmpty) {
-                    setState(() {
-                      if (images.length > 3) {
-                        selectedImages = images.take(3).toList();
-                      } else {
-                        selectedImages = images;
-                      }
-                    });
+
+                    List<XFile> compressedImages = [];
+                    for (var img in images.take(3)) {
+                      final compressed = await _compressIfNeeded(img);
+                      compressedImages.add(compressed);
+
+                    }
+
+                    setState(() => selectedImages = compressedImages);
+
                   }
                 },
               ),

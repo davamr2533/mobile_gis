@@ -43,7 +43,8 @@ dependencies:
   connectivity_plus: ^6.1.5       #untuk cek koneksi
   shared_preferences: ^2.0.0      #untuk menggunakan shared preferences
   smooth_page_indicator: ^1.1.0   #untuk dot indicator
-  path: ^1.8.3
+  path: ^1.8.3                    #untuk path file
+  flutter_image_compress: ^2.3.0  #untuk kompres gambar
 
 dev_dependencies:
   flutter_test:
