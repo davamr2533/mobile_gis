@@ -74,7 +74,7 @@ class _FormOntPageState extends State<FormOntPage> {
     setState(() => dialogProvinsi = provinsi);
   }
 
-  // === Simpan draft ke SharedPreferences ===
+  // === Simpan data ke SharedPreferences ===
   Future<List<Map<String, dynamic>>> _readDraftsFromStorage() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString('ont_drafts');
@@ -101,7 +101,12 @@ class _FormOntPageState extends State<FormOntPage> {
         selectedLongitude == null) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lengkapi semua data sebelum kirim ya 😄")),
+        SnackBar(
+            content: Text(
+              "Lengkapi semua data sebelum dikirim",
+              style: GoogleFonts.poppins(),
+            )
+        ),
       );
       return;
     }
@@ -109,17 +114,17 @@ class _FormOntPageState extends State<FormOntPage> {
     if (isOnline) {
       // === ONLINE ===
       try {
-        // Ubah 3 foto pertama jadi File
-        final File foto1 = File(selectedImages[0].path);
-        final File foto2 = File(selectedImages[1].path);
-        final File foto3 = File(selectedImages[2].path);
-
         // Tampilkan indikator loading
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (_) => const Center(child: CircularProgressIndicator()),
         );
+
+        // Kompresi foto sebelum upload
+        final File foto1 = File((await _compressIfNeeded(selectedImages[0])).path);
+        final File foto2 = File((await _compressIfNeeded(selectedImages[1])).path);
+        final File foto3 = File((await _compressIfNeeded(selectedImages[2])).path);
 
         // Kirim data ke server
         bool success = await OntPostService.postDataOnt(
@@ -388,7 +393,7 @@ class _FormOntPageState extends State<FormOntPage> {
     final dir = original.parent.path;
     final targetPath = '$dir/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
 
-    int quality = 80;
+    int quality = 70;
     File? compressed;
 
     do {
@@ -405,7 +410,7 @@ class _FormOntPageState extends State<FormOntPage> {
   }
 
 
-
+  //fungsi untuk mengambil gambar
   Future<void> _pickImageOptions() async {
     showModalBottomSheet(
       context: context,
@@ -426,8 +431,8 @@ class _FormOntPageState extends State<FormOntPage> {
                   final ImagePicker picker = ImagePicker();
                   final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
                   if (photo != null && selectedImages.length < 3) {
-                    final compressed = await _compressIfNeeded(photo);
-                    setState(() => selectedImages.add(compressed));
+                    // langsung tampilkan tanpa kompresi
+                    setState(() => selectedImages.add(photo));
                   }
                 },
               ),
@@ -441,17 +446,8 @@ class _FormOntPageState extends State<FormOntPage> {
                   final ImagePicker picker = ImagePicker();
                   final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
                   if (images.isNotEmpty) {
-
-                    List<XFile> compressedImages = [];
-                    for (var img in images.take(3)) {
-                      final compressed = await _compressIfNeeded(img);
-                      compressedImages.add(compressed);
-
-                    }
-
-                    setState(() => selectedImages.addAll(compressedImages.take(3 - selectedImages.length)));
-
-
+                    // langsung tampilkan tanpa kompresi
+                    setState(() => selectedImages.addAll(images.take(3 - selectedImages.length)));
                   }
                 },
               ),
