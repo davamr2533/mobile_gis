@@ -49,7 +49,40 @@ class _DraftOntTabState extends State<DraftOntTab> {
     await prefs.setString('ont_drafts', jsonEncode(drafts));
   }
 
-  //fungsi untuk compress ukuran gambar
+  // ✅ fungsi untuk compress file ke 200kb
+  Future<XFile> _compressIfNeeded(XFile file) async {
+    final original = File(file.path);
+    final size = await original.length();
+
+    if (size <= 200 * 1024) {
+      // jika ukuran foto dibawah 200 kb langsung upload
+      return file;
+    }
+
+    final filePath = original.absolute.path;
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
+
+    int quality = 80;
+    File? compressed;
+
+    // Kompres terus sampai < 200 KB
+    do {
+      final result = await FlutterImageCompress.compressAndGetFile(
+        original.path,
+        outPath,
+        quality: quality,
+      );
+      compressed = result != null ? File(result.path) : null;
+      quality -= 10;
+    } while (compressed != null &&
+        await compressed.length() > 200 * 1024 &&
+        quality > 10);
+
+    return XFile(compressed!.path);
+  }
+
+  // 🔧 fungsi compress image dari byte base64
   Future<File> _compressImage(Uint8List bytes) async {
     final tempDir = Directory.systemTemp;
     final tempFile = File(
@@ -57,18 +90,10 @@ class _DraftOntTabState extends State<DraftOntTab> {
     );
     await tempFile.writeAsBytes(bytes);
 
-    final result = await FlutterImageCompress.compressAndGetFile(
-      tempFile.path,
-      '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg',
-      quality: 80,
-    );
+    // Gunakan fungsi _compressIfNeeded
+    XFile compressedXFile = await _compressIfNeeded(XFile(tempFile.path));
 
-    if (result != null) {
-      // ubah XFile -> File
-      return File(result.path);
-    } else {
-      return tempFile;
-    }
+    return File(compressedXFile.path);
   }
 
 
@@ -86,7 +111,21 @@ class _DraftOntTabState extends State<DraftOntTab> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
+        builder: (_) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 12),
+              Text(
+                "Mengompres gambar...",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500
+                ),
+              )
+            ],
+          )
+        ),
       );
 
       // Kompres semua gambar base64
@@ -96,6 +135,26 @@ class _DraftOntTabState extends State<DraftOntTab> {
         File compressed = await _compressImage(bytes);
         compressedBase64.add(base64Encode(await compressed.readAsBytes()));
       }
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 12),
+              Text(
+                "Mengunggah data ke server...",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500
+                ),
+              )
+            ],
+          ),
+        ),
+      );
 
       // Kirim ke API
       final request = http.MultipartRequest(
@@ -114,17 +173,19 @@ class _DraftOntTabState extends State<DraftOntTab> {
         "status": "Pending",
       });
 
-      // File dari base64
-      for (int i = 0; i < images.length; i++) {
-        Uint8List bytes = base64Decode(images[i]);
+      // File hasil compress
+      for (int i = 0; i < compressedBase64.length; i++) {
+        Uint8List bytes = base64Decode(compressedBase64[i]);
         final tempDir = Directory.systemTemp;
-        final file = await File('${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg').writeAsBytes(bytes);
-        request.files.add(await http.MultipartFile.fromPath('foto_ont_${i + 1}', file.path));
+        final file = await File(
+          '${tempDir.path}/upload_${DateTime.now().millisecondsSinceEpoch}_$i.jpg',
+        ).writeAsBytes(bytes);
+        request.files
+            .add(await http.MultipartFile.fromPath('foto_ont_${i + 1}', file.path));
       }
 
       // Kirim request
       final response = await request.send();
-
       Navigator.pop(context); // tutup loading
 
       if (response.statusCode == 200) {

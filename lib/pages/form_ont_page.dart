@@ -377,38 +377,33 @@ class _FormOntPageState extends State<FormOntPage> {
     );
   }
 
-  //fungsi untuk compress file
+  //fungsi untuk compress file ke 200kb
   Future<XFile> _compressIfNeeded(XFile file) async {
     final original = File(file.path);
     final size = await original.length();
 
-    if (size <= 500 * 1024) {
-      // jika ukuran foto dibawah 500 kb langsung upload
-      return file;
-    }
+    if (size <= 200 * 1024) return file;
 
-    final filePath = original.absolute.path;
-    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
-    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
+    // Buat path output yang aman
+    final dir = original.parent.path;
+    final targetPath = '$dir/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
 
     int quality = 80;
     File? compressed;
 
-    // Kompres terus sampai < 500 KB
     do {
       final result = await FlutterImageCompress.compressAndGetFile(
         original.path,
-        outPath,
+        targetPath,
         quality: quality,
       );
       compressed = result != null ? File(result.path) : null;
       quality -= 10;
-    } while (compressed != null && await compressed.length() > 500 * 1024 && quality > 10);
+    } while (compressed != null && await compressed.length() > 200 * 1024 && quality > 10);
 
-
-
-    return XFile(compressed!.path);
+    return XFile(compressed?.path ?? file.path);
   }
+
 
 
   Future<void> _pickImageOptions() async {
@@ -454,7 +449,8 @@ class _FormOntPageState extends State<FormOntPage> {
 
                     }
 
-                    setState(() => selectedImages = compressedImages);
+                    setState(() => selectedImages.addAll(compressedImages.take(3 - selectedImages.length)));
+
 
                   }
                 },

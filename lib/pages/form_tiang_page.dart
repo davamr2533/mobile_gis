@@ -373,13 +373,13 @@ class _FormTiangPageState extends State<FormTiangPage> {
     );
   }
 
-  //fungsi untuk compress file
+  //fungsi untuk compress file ke 200kb
   Future<XFile> _compressIfNeeded(XFile file) async {
     final original = File(file.path);
     final size = await original.length();
 
-    if (size <= 500 * 1024) {
-      // jika ukuran foto dibawah 500 kb langsung upload
+    if (size <= 200 * 1024) {
+      // jika ukuran foto dibawah 200 kb langsung upload
       return file;
     }
 
@@ -390,7 +390,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
     int quality = 80;
     File? compressed;
 
-    // Kompres terus sampai < 500 KB
+    // Kompres terus sampai < 200 KB
     do {
       final result = await FlutterImageCompress.compressAndGetFile(
         original.path,
@@ -399,9 +399,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
       );
       compressed = result != null ? File(result.path) : null;
       quality -= 10;
-    } while (compressed != null && await compressed.length() > 500 * 1024 && quality > 10);
-
-
+    } while (compressed != null && await compressed.length() > 200 * 1024 && quality > 10);
 
     return XFile(compressed!.path);
   }
