@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/api/services/post/post_data_tiang.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -135,7 +136,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
         Navigator.pop(context);
 
         if (success) {
-          // ✅ Jika sukses
+
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -148,11 +149,13 @@ class _FormTiangPageState extends State<FormTiangPage> {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
             }
           });
+
         } else {
-          // ❌ Jika gagal
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Gagal kirim data ke server 😢")),
           );
+
         }
       } catch (e) {
         Navigator.pop(context);
@@ -161,19 +164,6 @@ class _FormTiangPageState extends State<FormTiangPage> {
         );
       }
 
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const PopUpSuccess(),
-      );
-
-      Future.delayed(const Duration(seconds: 2), () {
-        if (context.mounted) {
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
-        }
-      });
     } else {
       // === OFFLINE: Simpan ke draft ===
       final List<String> base64Images = [];
@@ -383,6 +373,39 @@ class _FormTiangPageState extends State<FormTiangPage> {
     );
   }
 
+  //fungsi untuk compress file
+  Future<XFile> _compressIfNeeded(XFile file) async {
+    final original = File(file.path);
+    final size = await original.length();
+
+    if (size <= 500 * 1024) {
+      // jika ukuran foto dibawah 500 kb langsung upload
+      return file;
+    }
+
+    final filePath = original.absolute.path;
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
+
+    int quality = 80;
+    File? compressed;
+
+    // Kompres terus sampai < 500 KB
+    do {
+      final result = await FlutterImageCompress.compressAndGetFile(
+        original.path,
+        outPath,
+        quality: quality,
+      );
+      compressed = result != null ? File(result.path) : null;
+      quality -= 10;
+    } while (compressed != null && await compressed.length() > 500 * 1024 && quality > 10);
+
+
+
+    return XFile(compressed!.path);
+  }
+
   Future<void> _pickImageOptions() async {
     showModalBottomSheet(
       context: context,
@@ -393,6 +416,8 @@ class _FormTiangPageState extends State<FormTiangPage> {
         return SafeArea(
           child: Wrap(
             children: [
+
+              //ambil foto dari kamera
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: Colors.black87),
                 title: Text("Ambil Foto dari Kamera", style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
@@ -401,10 +426,13 @@ class _FormTiangPageState extends State<FormTiangPage> {
                   final ImagePicker picker = ImagePicker();
                   final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
                   if (photo != null && selectedImages.length < 3) {
-                    setState(() => selectedImages.add(photo));
+                    final compressed = await _compressIfNeeded(photo);
+                    setState(() => selectedImages.add(compressed));
                   }
                 },
               ),
+
+              //ambil foto dari galeri
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.black87),
                 title: Text("Pilih dari Galeri", style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
@@ -413,13 +441,16 @@ class _FormTiangPageState extends State<FormTiangPage> {
                   final ImagePicker picker = ImagePicker();
                   final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
                   if (images.isNotEmpty) {
-                    setState(() {
-                      if (images.length > 3) {
-                        selectedImages = images.take(3).toList();
-                      } else {
-                        selectedImages = images;
-                      }
-                    });
+
+                    List<XFile> compressedImages = [];
+                    for (var img in images.take(3)) {
+                      final compressed = await _compressIfNeeded(img);
+                      compressedImages.add(compressed);
+
+                    }
+
+                    setState(() => selectedImages = compressedImages);
+
                   }
                 },
               ),

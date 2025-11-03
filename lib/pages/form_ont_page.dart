@@ -377,7 +377,6 @@ class _FormOntPageState extends State<FormOntPage> {
     );
   }
 
-
   //fungsi untuk compress file
   Future<XFile> _compressIfNeeded(XFile file) async {
     final original = File(file.path);
@@ -422,6 +421,8 @@ class _FormOntPageState extends State<FormOntPage> {
         return SafeArea(
           child: Wrap(
             children: [
+
+              //ambil foto dari kamera
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: Colors.black87),
                 title: Text("Ambil Foto dari Kamera", style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
@@ -435,6 +436,8 @@ class _FormOntPageState extends State<FormOntPage> {
                   }
                 },
               ),
+
+              //ambil foto dari galeri
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.black87),
                 title: Text("Pilih dari Galeri", style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
