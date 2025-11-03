@@ -429,9 +429,9 @@ class _FormOntPageState extends State<FormOntPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final ImagePicker picker = ImagePicker();
-                  final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                  final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 100);
                   if (photo != null && selectedImages.length < 3) {
-                    // langsung tampilkan tanpa kompresi
+
                     setState(() => selectedImages.add(photo));
                   }
                 },
@@ -444,9 +444,9 @@ class _FormOntPageState extends State<FormOntPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final ImagePicker picker = ImagePicker();
-                  final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
+                  final List<XFile> images = await picker.pickMultiImage(imageQuality: 100);
                   if (images.isNotEmpty) {
-                    // langsung tampilkan tanpa kompresi
+
                     setState(() => selectedImages.addAll(images.take(3 - selectedImages.length)));
                   }
                 },
