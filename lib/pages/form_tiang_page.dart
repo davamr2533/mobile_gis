@@ -23,6 +23,7 @@ class FormTiangPage extends StatefulWidget {
   State<FormTiangPage> createState() => _FormTiangPageState();
 }
 
+
 class _FormTiangPageState extends State<FormTiangPage> {
   double? selectedLatitude;
   double? selectedLongitude;
@@ -97,8 +98,14 @@ class _FormTiangPageState extends State<FormTiangPage> {
         selectedImages.isEmpty ||
         selectedLatitude == null ||
         selectedLongitude == null) {
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lengkapi semua data sebelum kirim ya 😄")),
+        SnackBar(
+            content: Text(
+              "Lengkapi semua data sebelum dikirim",
+              style: GoogleFonts.poppins(),
+            )
+        ),
       );
       return;
     }
@@ -106,17 +113,17 @@ class _FormTiangPageState extends State<FormTiangPage> {
     if (isOnline) {
       // === ONLINE ===
       try {
-        // Ubah 3 foto pertama jadi File
-        final File foto1 = File(selectedImages[0].path);
-        final File foto2 = File(selectedImages[1].path);
-        final File foto3 = File(selectedImages[2].path);
-
         // Tampilkan indikator loading
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (_) => const Center(child: CircularProgressIndicator()),
         );
+
+        // Kompresi foto sebelum upload
+        final File foto1 = File((await _compressIfNeeded(selectedImages[0])).path);
+        final File foto2 = File((await _compressIfNeeded(selectedImages[1])).path);
+        final File foto3 = File((await _compressIfNeeded(selectedImages[2])).path);
 
         // Kirim data ke server
         bool success = await TiangPostService.postDataTiang(
@@ -153,7 +160,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
         } else {
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Gagal kirim data ke server 😢")),
+            const SnackBar(content: Text("Gagal kirim data ke server")),
           );
 
         }
@@ -378,32 +385,29 @@ class _FormTiangPageState extends State<FormTiangPage> {
     final original = File(file.path);
     final size = await original.length();
 
-    if (size <= 200 * 1024) {
-      // jika ukuran foto dibawah 200 kb langsung upload
-      return file;
-    }
+    if (size <= 200 * 1024) return file;
 
-    final filePath = original.absolute.path;
-    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
-    final outPath = "${filePath.substring(0, lastIndex)}_compressed.jpg";
+    // Buat path output yang aman
+    final dir = original.parent.path;
+    final targetPath = '$dir/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
 
-    int quality = 80;
+    int quality = 70;
     File? compressed;
 
-    // Kompres terus sampai < 200 KB
     do {
       final result = await FlutterImageCompress.compressAndGetFile(
         original.path,
-        outPath,
+        targetPath,
         quality: quality,
       );
       compressed = result != null ? File(result.path) : null;
       quality -= 10;
     } while (compressed != null && await compressed.length() > 200 * 1024 && quality > 10);
 
-    return XFile(compressed!.path);
+    return XFile(compressed?.path ?? file.path);
   }
 
+  //fungsi untuk mengambil gambar
   Future<void> _pickImageOptions() async {
     showModalBottomSheet(
       context: context,
@@ -422,10 +426,10 @@ class _FormTiangPageState extends State<FormTiangPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final ImagePicker picker = ImagePicker();
-                  final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                  final XFile? photo = await picker.pickImage(source: ImageSource.camera, imageQuality: 100);
                   if (photo != null && selectedImages.length < 3) {
-                    final compressed = await _compressIfNeeded(photo);
-                    setState(() => selectedImages.add(compressed));
+
+                    setState(() => selectedImages.add(photo));
                   }
                 },
               ),
@@ -437,18 +441,10 @@ class _FormTiangPageState extends State<FormTiangPage> {
                 onTap: () async {
                   Navigator.pop(context);
                   final ImagePicker picker = ImagePicker();
-                  final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
+                  final List<XFile> images = await picker.pickMultiImage(imageQuality: 100);
                   if (images.isNotEmpty) {
 
-                    List<XFile> compressedImages = [];
-                    for (var img in images.take(3)) {
-                      final compressed = await _compressIfNeeded(img);
-                      compressedImages.add(compressed);
-
-                    }
-
-                    setState(() => selectedImages = compressedImages);
-
+                    setState(() => selectedImages.addAll(images.take(3 - selectedImages.length)));
                   }
                 },
               ),

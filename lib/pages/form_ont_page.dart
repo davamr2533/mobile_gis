@@ -16,14 +16,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 class FormOntPage extends StatefulWidget {
   const FormOntPage({super.key});
 
   @override
   State<FormOntPage> createState() => _FormOntPageState();
 }
+
 
 class _FormOntPageState extends State<FormOntPage> {
   double? selectedLatitude;
@@ -171,7 +170,6 @@ class _FormOntPageState extends State<FormOntPage> {
           SnackBar(content: Text("Terjadi error: $e")),
         );
       }
-
 
     } else {
       // === OFFLINE: Simpan ke draft ===
@@ -408,7 +406,6 @@ class _FormOntPageState extends State<FormOntPage> {
 
     return XFile(compressed?.path ?? file.path);
   }
-
 
   //fungsi untuk mengambil gambar
   Future<void> _pickImageOptions() async {
