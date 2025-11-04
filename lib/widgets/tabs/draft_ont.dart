@@ -103,11 +103,21 @@ class _DraftOntTabState extends State<DraftOntTab> {
 
       if (response.statusCode == 200) {
         await _deleteDraft(index);
+        Navigator.pop(context);
+
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => const PopUpSuccess(),
         );
+
+        // Tutup otomatis setelah 2 detik
+        Future.delayed(const Duration(seconds: 2), () {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        });
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Gagal upload: ${response.statusCode}")),
