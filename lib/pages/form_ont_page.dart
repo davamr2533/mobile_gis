@@ -174,8 +174,10 @@ class _FormOntPageState extends State<FormOntPage> {
     } else {
       // === OFFLINE: Simpan ke draft ===
       final List<String> base64Images = [];
+
       for (var img in selectedImages) {
-        final bytes = await img.readAsBytes();
+        final XFile compressedImg = await _compressIfNeeded(img);
+        final bytes = await File(compressedImg.path).readAsBytes();
         base64Images.add(base64Encode(bytes));
       }
 
