@@ -8,6 +8,7 @@ import 'package:gis_mobile/api/services/get/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/form_ont_page.dart';
 import 'package:gis_mobile/pages/form_tiang_page.dart';
+import 'package:gis_mobile/pages/history_page.dart';
 import 'package:gis_mobile/widgets/cards/history_home_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -381,15 +382,26 @@ class _HomePage extends State<HomePage> {
                           fontSize: 16,
                         ),
                       ),
+
                       const Spacer(),
-                      Text(
-                        "See All",
-                        style: GoogleFonts.poppins(
-                          color: AppColors.secondBase,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HistoryPage()),
+                          );
+                        },
+                        child: Text(
+                          "See All",
+                          style: GoogleFonts.poppins(
+                            color: AppColors.secondBase,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
+                      )
+
                     ],
                   ),
                 ),
