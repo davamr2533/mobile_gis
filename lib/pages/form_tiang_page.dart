@@ -173,40 +173,56 @@ class _FormTiangPageState extends State<FormTiangPage> {
 
     } else {
       // === OFFLINE: Simpan ke draft ===
-      final List<String> base64Images = [];
 
-      for (var img in selectedImages) {
-        final XFile compressedImg = await _compressIfNeeded(img);
-        final bytes = await File(compressedImg.path).readAsBytes();
-        base64Images.add(base64Encode(bytes));
-      }
-
-      final draft = {
-        'id': DateTime.now().millisecondsSinceEpoch,
-        'tiangNumber': _tiangController.text.trim(),
-        'provinsi': selectedProv,
-        'petugas': _petugasController.text.trim(),
-        'deskripsi': _deskripsiController.text.trim(),
-        'latitude': selectedLatitude,
-        'longitude': selectedLongitude,
-        'images': base64Images,
-        'createdAt': DateTime.now().toIso8601String(),
-      };
-
-      await _saveDraftToStorage(draft);
-
+      // Tampilkan indikator loading
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const PopUpDraft(),
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
 
-      Future.delayed(const Duration(seconds: 2), () {
-        if (context.mounted) {
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+      try {
+        final List<String> base64Images = [];
+
+        for (var img in selectedImages) {
+          final XFile compressedImg = await _compressIfNeeded(img);
+          final bytes = await File(compressedImg.path).readAsBytes();
+          base64Images.add(base64Encode(bytes));
         }
-      });
+
+        final draft = {
+          'id': DateTime.now().millisecondsSinceEpoch,
+          'tiangNumber': _tiangController.text.trim(),
+          'provinsi': selectedProv,
+          'petugas': _petugasController.text.trim(),
+          'deskripsi': _deskripsiController.text.trim(),
+          'latitude': selectedLatitude,
+          'longitude': selectedLongitude,
+          'images': base64Images,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
+
+        await _saveDraftToStorage(draft);
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const PopUpDraft(),
+        );
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (context.mounted) {
+            Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+          }
+        });
+
+      } catch (e) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal menyimpan draft: $e")),
+        );
+      }
     }
   }
 
