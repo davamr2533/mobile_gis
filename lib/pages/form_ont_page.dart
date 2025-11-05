@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -37,15 +36,12 @@ class _FormOntPageState extends State<FormOntPage> {
   final TextEditingController _petugasController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
     super.initState();
     loadProvinsi();
     checkConnection();
-    initializeNotifications();
 
     // pantau koneksi real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
@@ -54,40 +50,9 @@ class _FormOntPageState extends State<FormOntPage> {
     });
   }
 
-  //Fungsi untuk inisialisasi notifikasi
-  Future<void> initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings =
-    InitializationSettings(android: initializationSettingsAndroid);
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
 
-  //Fungsi untuk menampilkan notifikasi
-  Future<void> showSuccessNotification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'ont_channel_id', // id unik untuk channel
-      'ONT Notifications', // nama channel
-      channelDescription: 'Notifikasi untuk data ONT',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0, // ID notifikasi
-      'Data Berhasil Dikirim ✅',
-      'Data ONT telah tersimpan di server.',
-      platformChannelSpecifics,
-      payload: 'success_payload',
-    );
-  }
 
 
   // === Cek koneksi internet dengan ping ===
@@ -185,7 +150,6 @@ class _FormOntPageState extends State<FormOntPage> {
 
         if (success) {
 
-          await showSuccessNotification();
 
           showDialog(
             context: context,
