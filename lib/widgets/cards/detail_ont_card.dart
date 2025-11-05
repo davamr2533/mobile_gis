@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class DetailOntCard extends StatelessWidget {
@@ -24,6 +26,10 @@ class DetailOntCard extends StatelessWidget {
     ];
 
     final pageController = PageController();
+
+    // Konversi string latitude & longitude ke double
+    final double? lat = double.tryParse(ont.latitude);
+    final double? lng = double.tryParse(ont.longitude);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -107,6 +113,27 @@ class DetailOntCard extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 8),
 
+              //Map Preview
+              if (lat != null && lng != null)
+                _mapPreview(lat, lng)
+              else
+                Container(
+                  width: double.infinity,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Lokasi tidak valid",
+                    style: GoogleFonts.poppins(color: Colors.grey),
+                  ),
+                ),
+
+              const SizedBox(height: 8),
+
               _coordRow("Latitude", ont.latitude),
               _coordRow("Longitude", ont.longitude),
 
@@ -133,6 +160,44 @@ class DetailOntCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mapPreview(double lat, double lng) {
+    return Container(
+      height: 120,
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: AbsorbPointer(
+        absorbing: true,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: LatLng(lat, lng),
+            initialZoom: 15,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.gis_mobile',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: LatLng(lat, lng),
+                  width: 50,
+                  height: 50,
+                  child: const Icon(Icons.location_pin,
+                      color: Colors.red, size: 40),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
