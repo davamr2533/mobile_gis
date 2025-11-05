@@ -10,6 +10,7 @@ import 'package:gis_mobile/pages/form_ont_page.dart';
 import 'package:gis_mobile/pages/form_tiang_page.dart';
 import 'package:gis_mobile/pages/history_page.dart';
 import 'package:gis_mobile/widgets/cards/history_home_card.dart';
+import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
@@ -408,7 +409,7 @@ class _HomePage extends State<HomePage> {
                 const SizedBox(height: 14),
 
                 if (isLoadingHistory)
-                  const Center(child: CircularProgressIndicator())
+                  Center(child: AppWidget().loadingWidget())
                 else if (ontHistory.isEmpty)
                   Text(
                     "Belum ada data ONT",
