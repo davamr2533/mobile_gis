@@ -47,6 +47,7 @@ dependencies:
   flutter_image_compress: ^2.3.0  #untuk kompres gambar
   flutter_bloc: ^8.1.4            #untuk menggunakan cubit state
   flutter_spinkit: ^5.2.0         #untuk animasi loading
+  flutter_local_notifications: ^17.1.2        #untuk memunculkan notifikasi
 
 dev_dependencies:
   flutter_test:
