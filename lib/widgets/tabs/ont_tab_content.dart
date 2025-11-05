@@ -20,32 +20,62 @@ class _OntTabContent extends State<OntTabContent> {
     futureOnt = OntService.fetchDataOnt();
   }
 
+  // fungsi untuk refresh data
+  Future<void> _refreshData() async {
+    setState(() {
+      futureOnt = OntService.fetchDataOnt();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<OntModel>>(
         future: futureOnt,
         builder: (context, snapshot) {
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Loading
             return const Center(child: CircularProgressIndicator());
 
           } else if (snapshot.hasError) {
             // Error
-            return Center(
-              child: Text('Terjadi kesalahan: ${snapshot.error}'),
+            return RefreshIndicator(
+              onRefresh: _refreshData,
+              child: ListView(
+                children: [
+                  const SizedBox(height: 200),
+
+                  Center(
+                    child: Text(
+                      'Terjadi kesalahan: ${snapshot.error}',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.redAccent,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
 
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             // Data kosong
-            return Center(
-              child: Text(
-                'Tidak ada data ONT ditemukan.',
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54,
-                    fontSize: 16
-                ),
+            return RefreshIndicator(
+              onRefresh: _refreshData,
+              child: ListView(
+                children: [
+                  const SizedBox(height: 200),
+                  Center(
+                    child: Text(
+                      'Tidak ada data ONT ditemukan.',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
 
@@ -53,33 +83,33 @@ class _OntTabContent extends State<OntTabContent> {
             //Data berhasil diambil
             final dataOnt = snapshot.data!;
 
-            return ListView.builder(
-              padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
-              itemCount: dataOnt.length,
-              itemBuilder: (context, index) {
+            return RefreshIndicator(
+              onRefresh: _refreshData,
+              child: ListView.builder(
+                  padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
+                  itemCount: dataOnt.length,
+                  itemBuilder: (context, index) {
+                    final ont = dataOnt[index];
 
-                final ont = dataOnt[index];
+                    // Tentukan warna status
+                    Color statusColor;
+                    switch (ont.status.toLowerCase()) {
+                      case 'pending':
+                        statusColor = Colors.orange;
+                        break;
+                      case 'verified':
+                        statusColor = Colors.green;
+                        break;
+                      default:
+                        statusColor = Colors.grey;
+                    }
 
-                // Tentukan warna status
-                Color statusColor;
-                switch (ont.status.toLowerCase()) {
-                  case 'pending':
-                    statusColor = Colors.orange;
-                    break;
-                  case 'verified':
-                    statusColor = Colors.green;
-                    break;
-                  default:
-                    statusColor = Colors.grey;
-                }
-
-                return HistoryOntCard(
-                    ont: ont,
-                    statusColor: statusColor
-                );
-
-
-              }
+                    return HistoryOntCard(
+                        ont: ont,
+                        statusColor: statusColor
+                    );
+                  }
+              )
             );
           }
         }
