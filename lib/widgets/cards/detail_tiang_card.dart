@@ -17,11 +17,11 @@ class DetailTiangCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> images = [
-      if (tiang.fotoTiang1.isNotEmpty)
+      if (tiang.fotoTiang1 != null && tiang.fotoTiang1!.isNotEmpty)
         "http://202.169.231.66:82${tiang.fotoTiang1}",
-      if (tiang.fotoTiang2.isNotEmpty)
+      if (tiang.fotoTiang2 != null && tiang.fotoTiang2!.isNotEmpty)
         "http://202.169.231.66:82${tiang.fotoTiang2}",
-      if (tiang.fotoTiang2.isNotEmpty)
+      if (tiang.fotoTiang3 != null && tiang.fotoTiang3!.isNotEmpty)
         "http://202.169.231.66:82${tiang.fotoTiang3}",
     ];
 

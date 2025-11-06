@@ -152,10 +152,22 @@ class _FormOntPageState extends State<FormOntPage> {
           builder: (_) =>  Center(child: AppWidget().loadingWidget()),
         );
 
-        // Kompresi foto sebelum upload
-        final File foto1 = File((await _compressIfNeeded(selectedImages[0])).path);
-        final File foto2 = File((await _compressIfNeeded(selectedImages[1])).path);
-        final File foto3 = File((await _compressIfNeeded(selectedImages[2])).path);
+        // List foto yang sudah dikompres
+        List<File?> compressedFiles = [];
+
+        for (var img in selectedImages) {
+          final XFile compressedImg = await _compressIfNeeded(img);
+          compressedFiles.add(File(compressedImg.path));
+        }
+
+        // Jika foto kurang dari 3 sisanya null
+        while (compressedFiles.length < 3) {
+          compressedFiles.add(null);
+        }
+
+        final File? foto1 = compressedFiles[0];
+        final File? foto2 = compressedFiles[1];
+        final File? foto3 = compressedFiles[2];
 
         // Kirim data ke server
         bool success = await OntPostService.postDataOnt(

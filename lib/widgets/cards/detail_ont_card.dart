@@ -17,13 +17,14 @@ class DetailOntCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> images = [
-      if (ont.fotoOnt1.isNotEmpty)
+      if (ont.fotoOnt1 != null && ont.fotoOnt1!.isNotEmpty)
         "http://202.169.231.66:82${ont.fotoOnt1}",
-      if (ont.fotoOnt2.isNotEmpty)
+      if (ont.fotoOnt2 != null && ont.fotoOnt2!.isNotEmpty)
         "http://202.169.231.66:82${ont.fotoOnt2}",
-      if (ont.fotoOnt3.isNotEmpty)
+      if (ont.fotoOnt3 != null && ont.fotoOnt3!.isNotEmpty)
         "http://202.169.231.66:82${ont.fotoOnt3}",
     ];
+
 
     final pageController = PageController();
 

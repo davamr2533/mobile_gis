@@ -9,9 +9,9 @@ class OntPostService {
     required String nomorOnt,
     required String area,
     required String deskripsiRumah,
-    required File fotoOnt1,
-    required File fotoOnt2,
-    required File fotoOnt3,
+    File? fotoOnt1,
+    File? fotoOnt2,
+    File? fotoOnt3,
     required String latitude,
     required String longitude,
     required String namaPetugas,
@@ -30,9 +30,26 @@ class OntPostService {
       request.fields['status'] = status;
 
       // File upload
-      request.files.add(await http.MultipartFile.fromPath('foto_ont_1', fotoOnt1.path));
-      request.files.add(await http.MultipartFile.fromPath('foto_ont_2', fotoOnt2.path));
-      request.files.add(await http.MultipartFile.fromPath('foto_ont_3', fotoOnt3.path));
+      if (fotoOnt1 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_ont_1',
+          fotoOnt1.path,
+        ));
+      }
+
+      if (fotoOnt2 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_ont_2',
+          fotoOnt2.path,
+        ));
+      }
+
+      if (fotoOnt3 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_ont_3',
+          fotoOnt3.path,
+        ));
+      }
 
       var response = await request.send();
 

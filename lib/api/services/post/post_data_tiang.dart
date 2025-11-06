@@ -9,9 +9,9 @@ class TiangPostService {
     required String nomorTiang,
     required String area,
     required String deskripsiTiang,
-    required File fotoTiang1,
-    required File fotoTiang2,
-    required File fotoTiang3,
+    File? fotoTiang1,
+    File? fotoTiang2,
+    File? fotoTiang3,
     required String latitude,
     required String longitude,
     required String namaPetugas,
@@ -30,9 +30,26 @@ class TiangPostService {
       request.fields['status'] = status;
 
       // File upload
-      request.files.add(await http.MultipartFile.fromPath('foto_tiang_1', fotoTiang1.path));
-      request.files.add(await http.MultipartFile.fromPath('foto_tiang_2', fotoTiang2.path));
-      request.files.add(await http.MultipartFile.fromPath('foto_tiang_3', fotoTiang3.path));
+      if (fotoTiang1 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_tiang_1',
+          fotoTiang1.path,
+        ));
+      }
+
+      if (fotoTiang2 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_tiang_2',
+          fotoTiang2.path,
+        ));
+      }
+
+      if (fotoTiang3 != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'foto_tiang_3',
+          fotoTiang3.path,
+        ));
+      }
 
       var response = await request.send();
 

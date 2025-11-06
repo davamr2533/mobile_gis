@@ -3,9 +3,9 @@ class OntModel {
   final String nomorOnt;
   final String area;
   final String deskripsiRumah;
-  final String fotoOnt1;
-  final String fotoOnt2;
-  final String fotoOnt3;
+  final String? fotoOnt1;
+  final String? fotoOnt2;
+  final String? fotoOnt3;
   final String latitude;
   final String longitude;
   final String namaPetugas;
@@ -17,9 +17,9 @@ class OntModel {
     required this.nomorOnt,
     required this.area,
     required this.deskripsiRumah,
-    required this.fotoOnt1,
-    required this.fotoOnt2,
-    required this.fotoOnt3,
+    this.fotoOnt1,
+    this.fotoOnt2,
+    this.fotoOnt3,
     required this.latitude,
     required this.longitude,
     required this.namaPetugas,

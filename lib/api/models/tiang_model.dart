@@ -3,9 +3,9 @@ class TiangModel {
   final String nomorTiang;
   final String area;
   final String deskripsiTiang;
-  final String fotoTiang1;
-  final String fotoTiang2;
-  final String fotoTiang3;
+  final String? fotoTiang1;
+  final String? fotoTiang2;
+  final String? fotoTiang3;
   final String latitude;
   final String longitude;
   final String namaPetugas;
@@ -17,9 +17,9 @@ class TiangModel {
     required this.nomorTiang,
     required this.area,
     required this.deskripsiTiang,
-    required this.fotoTiang1,
-    required this.fotoTiang2,
-    required this.fotoTiang3,
+    this.fotoTiang1,
+    this.fotoTiang2,
+    this.fotoTiang3,
     required this.latitude,
     required this.longitude,
     required this.namaPetugas,
