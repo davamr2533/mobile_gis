@@ -410,6 +410,17 @@ class _HomePage extends State<HomePage> {
 
                 if (isLoadingHistory)
                   Center(child: AppWidget().loadingWidget())
+
+                else if (!isOnline)
+                  Text(
+                    "Anda Offline",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.red,
+                    ),
+                  )
+
                 else if (ontHistory.isEmpty)
                   Text(
                     "Belum ada data ONT",

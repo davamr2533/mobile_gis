@@ -6,6 +6,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
+import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_draft.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:image_picker/image_picker.dart';
@@ -123,7 +124,7 @@ class _FormOntPageState extends State<FormOntPage> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          builder: (_) =>  Center(child: AppWidget().loadingWidget()),
         );
 
         // Kompresi foto sebelum upload
@@ -149,7 +150,6 @@ class _FormOntPageState extends State<FormOntPage> {
         Navigator.pop(context);
 
         if (success) {
-
 
           showDialog(
             context: context,
@@ -185,7 +185,7 @@ class _FormOntPageState extends State<FormOntPage> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
+        builder: (_) => Center(child: AppWidget().loadingWidget()),
       );
 
       try {
