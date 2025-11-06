@@ -39,7 +39,7 @@ class _TiangTabContent extends State<TiangTabContent> {
             if (state is TiangError) {
               return Center(
                 child: Text(
-                  'Terjadi kesalahan: ${state.message}',
+                  'Terjadi kesalahan: Connection Failed',
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     color: Colors.redAccent,
