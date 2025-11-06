@@ -10,7 +10,6 @@ import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_draft.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:gis_mobile/api/services/get/get_provinsi.dart';
 import 'package:gis_mobile/pages/map_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -24,24 +23,61 @@ class FormOntPage extends StatefulWidget {
   State<FormOntPage> createState() => _FormOntPageState();
 }
 
-
 class _FormOntPageState extends State<FormOntPage> {
   double? selectedLatitude;
   double? selectedLongitude;
   List<XFile> selectedImages = [];
   String? selectedProv;
-  List<String> dialogProvinsi = [];
   bool isOnline = false;
+
+  List<String> dialogProvinsi = [
+    "Aceh",
+    "Sumatera Utara",
+    "Sumatera Barat",
+    "Riau",
+    "Jambi",
+    "Sumatera Selatan",
+    "Bengkulu",
+    "Lampung",
+    "Kep. Bangka Belitung",
+    "Kep. Riau",
+    "DKI Jakarta",
+    "Jawa Barat",
+    "Jawa Tengah",
+    "DI Yogyakarta",
+    "Jawa Timur",
+    "Banten",
+    "Bali",
+    "Nusa Tenggara Barat",
+    "Nusa Tenggara Timur",
+    "Kalimantan Barat",
+    "Kalimantan Tengah",
+    "Kalimantan Selatan",
+    "Kalimantan Timur",
+    "Kalimantan Utara",
+    "Sulawesi Utara",
+    "Sulawesi Tengah",
+    "Sulawesi Selatan",
+    "Sulawesi Tenggara",
+    "Gorontalo",
+    "Sulawesi Barat",
+    "Maluku",
+    "Maluku Utara",
+    "Papua",
+    "Papua Barat",
+    "Papua Tengah",
+    "Papua Pegunungan",
+    "Papua Selatan",
+    "Papua Barat Daya",
+  ];
 
   final TextEditingController _ontController = TextEditingController();
   final TextEditingController _petugasController = TextEditingController();
   final TextEditingController _deskripsiController = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
-    loadProvinsi();
     checkConnection();
 
     // pantau koneksi real-time
@@ -50,11 +86,6 @@ class _FormOntPageState extends State<FormOntPage> {
       if (mounted) setState(() => isOnline = hasNetwork);
     });
   }
-
-
-
-
-
 
   // === Cek koneksi internet dengan ping ===
   Future<bool> _hasNetworkConnection(List<ConnectivityResult> results) async {
@@ -72,12 +103,6 @@ class _FormOntPageState extends State<FormOntPage> {
     final results = await Connectivity().checkConnectivity();
     final hasNetwork = await _hasNetworkConnection(results);
     if (mounted) setState(() => isOnline = hasNetwork);
-  }
-
-  // === Ambil data provinsi ===
-  Future<void> loadProvinsi() async {
-    final provinsi = await getProvinsi();
-    setState(() => dialogProvinsi = provinsi);
   }
 
   // === Simpan data ke SharedPreferences ===
@@ -331,17 +356,26 @@ class _FormOntPageState extends State<FormOntPage> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
+
                     value: selectedProv,
                     hint: Text(
-                      dialogProvinsi.isEmpty ? "Loading provinsi..." : "Pilih Provinsi",
-                      style: GoogleFonts.poppins(color: Colors.black54, fontWeight: FontWeight.w500, fontSize: 13),
+                      "Pilih Provinsi",
+                      style: GoogleFonts.poppins(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
                     ),
                     isExpanded: true,
                     items: dialogProvinsi.map((prov) {
-                      return DropdownMenuItem(value: prov, child: Text(prov, style: GoogleFonts.poppins()));
+                      return DropdownMenuItem(
+                        value: prov,
+                        child: Text(prov, style: GoogleFonts.poppins()),
+                      );
                     }).toList(),
                     onChanged: (value) => setState(() => selectedProv = value),
-                  ),
+
+                  )
                 ),
               ),
               const SizedBox(height: 12),
