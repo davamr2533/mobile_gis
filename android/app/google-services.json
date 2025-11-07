@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "375494364461",
+    "project_id": "mobile-gis-4213",
+    "storage_bucket": "mobile-gis-4213.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:375494364461:android:9845f28990e67e82c6d7a4",
+        "android_client_info": {
+          "package_name": "com.example.gis_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA18SUbcBmjpEP5p3JRFE1NxWtKXAdREx0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
