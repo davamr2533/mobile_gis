@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gis_mobile/api/services/get/get_notifikasi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/widgets/cards/notification_card.dart';
+import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationPage extends StatelessWidget {
@@ -41,7 +42,7 @@ class NotificationPage extends StatelessWidget {
           builder: (context, snapshot) {
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: AppWidget().loadingWidget());
             }
 
             if (snapshot.hasError) {
