@@ -5,8 +5,28 @@ import 'package:gis_mobile/widgets/cards/notification_card.dart';
 import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class NotificationPage extends StatelessWidget {
+class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
+
+  @override
+  State<NotificationPage> createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
+  late Future<List<dynamic>> _notifikasiFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _notifikasiFuture = NotifikasiService.fetchDataNotifikasi();
+  }
+
+  Future<void> _refreshNotifikasi() async {
+    setState(() {
+      _notifikasiFuture = NotifikasiService.fetchDataNotifikasi();
+    });
+    await _notifikasiFuture; // tunggu sampai selesai
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +45,6 @@ class NotificationPage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             elevation: 0,
             centerTitle: false,
-
             title: Text(
               "Notification",
               style: GoogleFonts.poppins(
@@ -36,37 +55,35 @@ class NotificationPage extends StatelessWidget {
           ),
         ),
       ),
+      body: FutureBuilder<List<dynamic>>(
+        future: _notifikasiFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: AppWidget().loadingWidget());
+          }
 
-      body: FutureBuilder(
-          future: NotifikasiService.fetchDataNotifikasi(),
-          builder: (context, snapshot) {
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: AppWidget().loadingWidget());
-            }
-
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("Error: ${snapshot.error}"),
-              );
-            }
-
-            final notifikasi = snapshot.data!;
-
-            return Padding(
-                padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
-                child: ListView.builder(
-                  itemCount: notifikasi.length,
-                    itemBuilder: (context, index)  {
-                      final item = notifikasi[index];
-                      return NotificationCard(notif: item);
-                    }
-                )
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
             );
           }
-      )
 
+          final notifikasi = snapshot.data!;
 
+          return RefreshIndicator(
+            onRefresh: _refreshNotifikasi,
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+              itemCount: notifikasi.length,
+              itemBuilder: (context, index) {
+                final item = notifikasi[index];
+                return NotificationCard(notif: item);
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
+

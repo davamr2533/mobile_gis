@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'firebase_options.dart'; // hasil flutterfire configure
+import 'package:gis_mobile/api/services/notification_service.dart';
+import 'firebase_options.dart';
 import 'package:gis_mobile/splash_screen.dart';
 
+// Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   print("📩 Notifikasi diterima di background: ${message.notification?.title}");
+
+  // Bisa juga panggil local notification kalau mau heads-up di background
+  if (message.notification != null) {
+    await NotificationService.showNotification(
+      title: message.notification!.title ?? 'Notifikasi',
+      body: message.notification!.body ?? '',
+    );
+  }
 }
 
 void main() async {
@@ -19,6 +30,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Init NotificationService
+  await NotificationService.init();
+
   // Background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -27,12 +41,8 @@ void main() async {
 
   // Ambil FCM Token
   String? token = await FirebaseMessaging.instance.getToken();
-  print("🔥 FCM TOKEN DEVICE INI: $token");
 
-  // Listener notif saat app dibuka (foreground)
-  FirebaseMessaging.onMessage.listen((message) {
-    print("📩 Notifikasi Foreground: ${message.notification?.title}");
-  });
+  print("🔥 FCM TOKEN DEVICE INI: $token");
 
   runApp(const MyApp());
 }
