@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gis_mobile/api/services/get/get_notifikasi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/widgets/cards/notification_card.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,23 +36,36 @@ class NotificationPage extends StatelessWidget {
         ),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
+      body: FutureBuilder(
+          future: NotifikasiService.fetchDataNotifikasi(),
+          builder: (context, snapshot) {
 
-              NotificationCard(),
-              NotificationCard(),
-              NotificationCard(),
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("Error: ${snapshot.error}"),
+              );
+            }
+
+            final notifikasi = snapshot.data!;
+
+            return Padding(
+                padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+                child: ListView.builder(
+                  itemCount: notifikasi.length,
+                    itemBuilder: (context, index)  {
+                      final item = notifikasi[index];
+                      return NotificationCard(notif: item);
+                    }
+                )
+            );
+          }
+      )
 
 
-
-            ],
-          )
-        )
-
-      ),
     );
   }
 }
