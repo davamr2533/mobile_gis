@@ -423,7 +423,7 @@ class _HomePage extends State<HomePage> {
 
                 else if (ontHistory.isEmpty)
                   Text(
-                    "Belum ada data ONT",
+                    "Belum ada data terkirim",
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                   )
                 else
