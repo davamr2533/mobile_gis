@@ -33,7 +33,7 @@ void main() async {
   // Kirim token ke backend Laravel
   await sendTokenToBackend(token);
 
-  // Token berubah? kirim ulang ke backend.
+  // kirim ulang ke backend, jika token berubah.
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
     print("🔄 Token diperbarui: $newToken");
     sendTokenToBackend(newToken);
@@ -59,7 +59,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
