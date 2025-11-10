@@ -155,7 +155,6 @@ class _FormOntPageState extends State<FormOntPage> {
 
         String? token = await FirebaseMessaging.instance.getToken();
 
-
         // List foto yang sudah dikompres
         List<File?> compressedFiles = [];
 
