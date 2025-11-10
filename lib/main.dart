@@ -4,7 +4,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:gis_mobile/api/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'package:gis_mobile/splash_screen.dart';
-import 'package:http/http.dart' as http;
 
 
 
@@ -27,17 +26,8 @@ void main() async {
 
   // Ambil FCM Token
   String? token = await FirebaseMessaging.instance.getToken();
-
   print("FCM TOKEN DEVICE : $token");
 
-  // Kirim token ke backend Laravel
-  await sendTokenToBackend(token);
-
-  // kirim ulang ke backend, jika token berubah.
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    print("🔄 Token diperbarui: $newToken");
-    sendTokenToBackend(newToken);
-  });
 
   runApp(const MyApp());
 }
@@ -64,7 +54,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  print("📩 Notifikasi diterima di background: ${message.notification?.title}");
+  print("📩 Notifikasi background: ${message.notification?.title}");
 
   if (message.notification != null) {
     await NotificationService.showNotification(
@@ -74,15 +64,4 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-Future<void> sendTokenToBackend(String? token) async {
-  if (token == null) return;
 
-  const url = "https://nunggu dikirim xixixixi";
-
-  await http.post(
-    Uri.parse(url),
-    body: {
-      "token": token,
-    },
-  );
-}

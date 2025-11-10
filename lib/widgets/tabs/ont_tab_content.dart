@@ -39,15 +39,17 @@ class _OntTabContent extends State<OntTabContent> {
             if (state is OntError) {
               return Center(
                 child: Text(
-                  'Terjadi kesalahan: Connection Failed',
+                  'Error: ${state.message}',
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     color: Colors.redAccent,
                     fontSize: 16,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               );
             }
+
 
             //State Data Kosong
             if (state is OntEmpty) {

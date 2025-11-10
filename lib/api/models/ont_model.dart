@@ -10,6 +10,9 @@ class OntModel {
   final String longitude;
   final String namaPetugas;
   final String status;
+  final String statusNotifikasi;
+  final String tipeNotifikasi;
+  final String fcmToken;
   final String createdAt;
 
   OntModel({
@@ -24,6 +27,9 @@ class OntModel {
     required this.longitude,
     required this.namaPetugas,
     required this.status,
+    required this.statusNotifikasi,
+    required this.tipeNotifikasi,
+    required this.fcmToken,
     required this.createdAt,
   });
 
@@ -40,6 +46,9 @@ class OntModel {
       longitude: json['longitude'],
       namaPetugas: json['nama_petugas'],
       status: json['status'],
+      statusNotifikasi: json['status_notifikasi'],
+      tipeNotifikasi: json['tipe_notifikasi'],
+      fcmToken: json['fcm_token'],
       createdAt: json['created_at'],
     );
   }
