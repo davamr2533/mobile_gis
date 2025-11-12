@@ -68,6 +68,13 @@ class _TiangTabContent extends State<TiangTabContent> {
             if (state is TiangLoaded) {
               final dataTiang = state.data;
 
+              // 🔽 Urutkan dari yang terbaru (createdAt paling besar)
+              dataTiang.sort((a, b) {
+                final dateA = DateTime.tryParse(a.createdAt) ?? DateTime(0);
+                final dateB = DateTime.tryParse(b.createdAt) ?? DateTime(0);
+                return dateB.compareTo(dateA);
+              });
+
               return RefreshIndicator(
                 onRefresh: () async => context.read<TiangCubit>().fetchTiangData(),
                 child: ListView.builder(

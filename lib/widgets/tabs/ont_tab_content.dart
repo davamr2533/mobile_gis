@@ -69,6 +69,13 @@ class _OntTabContent extends State<OntTabContent> {
             if (state is OntLoaded) {
               final dataOnt = state.data;
 
+              //Urutkan dari yang terbaru (createdAt paling besar)
+              dataOnt.sort((a, b) {
+                final dateA = DateTime.tryParse(a.createdAt) ?? DateTime(0);
+                final dateB = DateTime.tryParse(b.createdAt) ?? DateTime(0);
+                return dateB.compareTo(dateA);
+              });
+
               return RefreshIndicator(
                 onRefresh: () async => context.read<OntCubit>().fetchOntData(),
                 child: ListView.builder(
