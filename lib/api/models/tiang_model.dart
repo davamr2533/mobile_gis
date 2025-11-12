@@ -10,6 +10,9 @@ class TiangModel {
   final String longitude;
   final String namaPetugas;
   final String status;
+  final String? statusNotifikasi;
+  final String? tipeNotifikasi;
+  final String? fcmToken;
   final String createdAt;
 
   TiangModel({
@@ -24,6 +27,9 @@ class TiangModel {
     required this.longitude,
     required this.namaPetugas,
     required this.status,
+    this.statusNotifikasi,
+    this.tipeNotifikasi,
+    this.fcmToken,
     required this.createdAt,
   });
 
@@ -40,6 +46,9 @@ class TiangModel {
       longitude: json['longitude'],
       namaPetugas: json['nama_petugas'],
       status: json['status'],
+      statusNotifikasi: json['status_notifikasi'] ?? '',
+      tipeNotifikasi: json['tipe_notifikasi'] ?? '',
+      fcmToken: json['fcm_token'] ?? '',
       createdAt: json['created_at'],
     );
   }

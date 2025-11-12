@@ -16,6 +16,9 @@ class TiangPostService {
     required String longitude,
     required String namaPetugas,
     required String status,
+    required String statusNotifikasi,
+    required String tipeNotifikasi,
+    required String fcmToken,
   }) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
@@ -28,6 +31,9 @@ class TiangPostService {
       request.fields['longitude'] = longitude;
       request.fields['nama_petugas'] = namaPetugas;
       request.fields['status'] = status;
+      request.fields['status_notifikasi'] = statusNotifikasi;
+      request.fields['tipe_notifikasi'] = tipeNotifikasi;
+      request.fields['fcm_token'] = fcmToken;
 
       // File upload
       if (fotoTiang1 != null) {

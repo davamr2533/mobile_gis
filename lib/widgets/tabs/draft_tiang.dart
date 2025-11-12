@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
@@ -71,6 +72,9 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         builder: (_) => Center(child: AppWidget().loadingWidget()),
       );
 
+      // ✅ Ambil FCM token
+      String? token = await FirebaseMessaging.instance.getToken();
+
       // Kirim ke API
       final request = http.MultipartRequest(
         'POST',
@@ -86,6 +90,9 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         "longitude": item['longitude'].toString(),
         "nama_petugas": item['petugas'],
         "status": "Pending",
+        "status_notifikasi": "Pending",
+        "tipe_notifikasi": "Submitted",
+        "fcm_token": token ?? "",
       });
 
       // Kirim file langsung dari base64 (tanpa kompres)

@@ -184,8 +184,8 @@ class _FormOntPageState extends State<FormOntPage> {
           longitude: selectedLongitude!.toString(),
           namaPetugas: _petugasController.text.trim(),
           status: "Pending",
-          statusNotifikasi: "Submitted",
-          tipeNotifikasi: "Data ONT dengan ID ${_ontController.text.trim()} berhasil dikirim",
+          statusNotifikasi: "Pending",
+          tipeNotifikasi: "Submitted",
           fcmToken: token ?? ""
         );
 

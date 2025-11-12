@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/api/services/post/post_data_tiang.dart';
@@ -152,6 +153,8 @@ class _FormTiangPageState extends State<FormTiangPage> {
           builder: (_) =>  Center(child: AppWidget().loadingWidget()),
         );
 
+        String? token = await FirebaseMessaging.instance.getToken();
+
         // List foto yang sudah dikompres
         List<File?> compressedFiles = [];
 
@@ -181,6 +184,9 @@ class _FormTiangPageState extends State<FormTiangPage> {
           longitude: selectedLongitude!.toString(),
           namaPetugas: _petugasController.text.trim(),
           status: "Pending",
+          statusNotifikasi: "Pending",
+          tipeNotifikasi: "Submitted",
+          fcmToken: token ?? ""
         );
 
         // Tutup loading dialog

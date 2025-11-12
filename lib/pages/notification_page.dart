@@ -25,7 +25,7 @@ class _NotificationPageState extends State<NotificationPage> {
     setState(() {
       _notifikasiFuture = NotifikasiService.fetchDataNotifikasi();
     });
-    await _notifikasiFuture; // tunggu sampai selesai
+    await _notifikasiFuture;
   }
 
   @override
@@ -70,13 +70,42 @@ class _NotificationPageState extends State<NotificationPage> {
 
           final notifikasi = snapshot.data!;
 
+          // Sort terbaru di atas
+          notifikasi.sort((a, b) {
+            return DateTime.parse(b.createdAt)
+                .compareTo(DateTime.parse(a.createdAt));
+          });
+
           return RefreshIndicator(
             onRefresh: _refreshNotifikasi,
             child: ListView.builder(
               padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
-              itemCount: notifikasi.length,
+              itemCount: notifikasi.length + 1, // ✅ tambah 1 item di atas
               itemBuilder: (context, index) {
-                final item = notifikasi[index];
+
+
+                if (index == 0) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.pink.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.pink.shade200),
+                    ),
+                    child: Text(
+                      "Notifikasi akan hilang secara otomatis dalam 30 hari.",
+                      style: GoogleFonts.poppins(
+                        color: Colors.red.shade400,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  );
+                }
+
+                // ✅ sisanya = notifikasi asli
+                final item = notifikasi[index - 1]; // karena index 0 untuk info
                 return NotificationCard(notif: item);
               },
             ),
@@ -86,4 +115,3 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 }
-
