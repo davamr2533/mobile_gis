@@ -64,7 +64,15 @@ class _NotificationPageState extends State<NotificationPage> {
 
           if (snapshot.hasError) {
             return Center(
-              child: Text("Error: ${snapshot.error}"),
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
+
+              ),
             );
           }
 

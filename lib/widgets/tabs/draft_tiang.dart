@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
+import 'package:gis_mobile/widgets/pop_up/pop_up_failed.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
@@ -133,10 +134,22 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
       }
 
     } catch (e) {
+
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const PopUpFailed(),
       );
+
+      // Tutup otomatis setelah 2 detik
+      Future.delayed(const Duration(seconds: 2), () {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      });
+
     }
   }
 
