@@ -44,7 +44,7 @@ class NotificationCard extends StatelessWidget {
                         ),
 
                         Text(
-                          "Data GIS berhasil dikirim",
+                          "Data ${notif.jenis} berhasil dikirim",
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.grey,
