@@ -18,11 +18,11 @@ class DetailTiangCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> images = [
       if (tiang.fotoTiang1 != null && tiang.fotoTiang1!.isNotEmpty)
-        "http://202.169.224.27:8081${tiang.fotoTiang1}",
-      if (tiang.fotoTiang2 != null && tiang.fotoTiang2!.isNotEmpty)
-        "http://202.169.224.27:8081${tiang.fotoTiang2}",
-      if (tiang.fotoTiang3 != null && tiang.fotoTiang3!.isNotEmpty)
-        "http://202.169.224.27:8081${tiang.fotoTiang3}",
+        _fixUrl(tiang.fotoTiang1!),
+      if (tiang.fotoTiang2  != null && tiang.fotoTiang2!.isNotEmpty)
+        _fixUrl(tiang.fotoTiang2!),
+      if (tiang.fotoTiang3  != null && tiang.fotoTiang3!.isNotEmpty)
+        _fixUrl(tiang.fotoTiang3!),
     ];
 
     final pageController = PageController();
@@ -254,6 +254,18 @@ class DetailTiangCard extends StatelessWidget {
       ),
     );
   }
+
+  String _fixUrl(String url) {
+    if (url.startsWith('http://localhost')) {
+      return url.replaceAll('http://localhost', 'http://202.169.224.27:8081');
+
+    } else if (!url.startsWith('http')) {
+      return 'http://202.169.224.27:8081$url';
+
+    }
+    return url;
+  }
+
 }
 
 

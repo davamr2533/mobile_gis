@@ -48,10 +48,17 @@ class HistoryOntCard extends StatelessWidget {
                         BlendMode.darken,
                       ),
                       child: Image.network(
-                        'http://202.169.224.27:8081${ont.fotoOnt1}',
+                        _fixUrl(ont.fotoOnt1 ?? ''),
                         width: double.infinity,
                         height: 100,
                         fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: AppColors.fifthBase,
+                          height: 100,
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.grey, size: 40),
+                        ),
                       ),
                     )
                 ),
@@ -141,4 +148,16 @@ class HistoryOntCard extends StatelessWidget {
       ),
     );
   }
+
+  String _fixUrl(String url) {
+    if (url.isEmpty) return '';
+
+    if (url.startsWith('http://localhost')) {
+      return url.replaceAll('http://localhost', 'http://202.169.224.27:8081');
+    } else if (!url.startsWith('http')) {
+      return 'http://202.169.224.27:8081$url';
+    }
+    return url;
+  }
+
 }

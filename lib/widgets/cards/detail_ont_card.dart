@@ -18,11 +18,11 @@ class DetailOntCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> images = [
       if (ont.fotoOnt1 != null && ont.fotoOnt1!.isNotEmpty)
-        "http://202.169.224.27:8081${ont.fotoOnt1}",
+        _fixUrl(ont.fotoOnt1!),
       if (ont.fotoOnt2 != null && ont.fotoOnt2!.isNotEmpty)
-        "http://202.169.224.27:8081${ont.fotoOnt2}",
+        _fixUrl(ont.fotoOnt2!),
       if (ont.fotoOnt3 != null && ont.fotoOnt3!.isNotEmpty)
-        "http://202.169.224.27:8081${ont.fotoOnt3}",
+        _fixUrl(ont.fotoOnt3!),
     ];
 
 
@@ -255,4 +255,17 @@ class DetailOntCard extends StatelessWidget {
       ),
     );
   }
+
+  String _fixUrl(String url) {
+    if (url.startsWith('http://localhost')) {
+      return url.replaceAll('http://localhost', 'http://202.169.224.27:8081');
+
+    } else if (!url.startsWith('http')) {
+      return 'http://202.169.224.27:8081$url';
+
+    }
+    return url;
+  }
+
+
 }
