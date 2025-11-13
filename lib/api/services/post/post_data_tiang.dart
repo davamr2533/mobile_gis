@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class TiangPostService {
-  static const String baseUrl = "http://202.169.231.66:82/api/v1/gis/post-data-tiang";
+  static const String baseUrl = "http://202.169.224.27:8081/api/v1/gis/post-data-tiang";
 
   static Future<bool> postDataTiang({
     required String nomorTiang,

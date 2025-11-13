@@ -18,11 +18,11 @@ class DetailTiangCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> images = [
       if (tiang.fotoTiang1 != null && tiang.fotoTiang1!.isNotEmpty)
-        "http://202.169.231.66:82${tiang.fotoTiang1}",
+        "http://202.169.224.27:8081${tiang.fotoTiang1}",
       if (tiang.fotoTiang2 != null && tiang.fotoTiang2!.isNotEmpty)
-        "http://202.169.231.66:82${tiang.fotoTiang2}",
+        "http://202.169.224.27:8081${tiang.fotoTiang2}",
       if (tiang.fotoTiang3 != null && tiang.fotoTiang3!.isNotEmpty)
-        "http://202.169.231.66:82${tiang.fotoTiang3}",
+        "http://202.169.224.27:8081${tiang.fotoTiang3}",
     ];
 
     final pageController = PageController();

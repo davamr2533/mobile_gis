@@ -3,7 +3,7 @@ import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:http/http.dart' as http;
 
 class OntService {
-  static const String baseUrl = 'http://202.169.231.66:82/api/v1/gis/get-data-ont';
+  static const String baseUrl = 'http://202.169.224.27:8081/api/v1/gis/get-data-ont';
 
   static Future<List<OntModel>> fetchDataOnt() async {
     final response = await http.get(Uri.parse(baseUrl));

@@ -3,7 +3,7 @@ import 'package:gis_mobile/api/models/tiang_model.dart';
 import 'package:http/http.dart' as http;
 
 class TiangService {
-  static const String baseUrl = 'http://202.169.231.66:82/api/v1/gis/get-data-tiang';
+  static const String baseUrl = 'http://202.169.224.27:8081/api/v1/gis/get-data-tiang';
 
   static Future<List<TiangModel>> fetchDataTiang() async {
     final response = await http.get(Uri.parse(baseUrl));

@@ -48,7 +48,7 @@ class HistoryTiangCard extends StatelessWidget {
                           BlendMode.darken,
                         ),
                         child: Image.network(
-                          'http://202.169.231.66:82${tiang.fotoTiang1}',
+                          'http://202.169.224.27:8081${tiang.fotoTiang1}',
                           width: double.infinity,
                           height: 100,
                           fit: BoxFit.cover,

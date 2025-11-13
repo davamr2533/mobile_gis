@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class OntPostService {
-  static const String baseUrl = "http://202.169.231.66:82/api/v1/gis/post-data-ont";
+  static const String baseUrl = "http://202.169.224.27:8081/api/v1/gis/post-data-ont";
 
   static Future<bool> postDataOnt({
     required String nomorOnt,

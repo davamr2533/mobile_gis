@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gis_mobile/api/services/get/get_data_ont.dart';
 import 'package:gis_mobile/api/services/get/get_data_tiang.dart';
-import 'package:gis_mobile/api/services/get/get_provinsi.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/form_ont_page.dart';
 import 'package:gis_mobile/pages/form_tiang_page.dart';
@@ -31,7 +30,6 @@ class _HomePage extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    fetchProvinsi();
     checkConnection();
     checkGpsStatus();
     fetchAllHistory();
@@ -62,19 +60,7 @@ class _HomePage extends State<HomePage> {
 
   }
 
-  // === Ambil daftar provinsi dari API ===
-  Future<void> fetchProvinsi() async {
-    try {
-      final provinsi = await getProvinsi();
-      if (mounted) {
-        setState(() {
-          provinsiList = provinsi;
-        });
-      }
-    } catch (e) {
-      debugPrint("Gagal fetch provinsi: $e");
-    }
-  }
+
 
   Future<void> fetchAllHistory() async {
     try {

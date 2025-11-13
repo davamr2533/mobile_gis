@@ -79,7 +79,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
       // Kirim ke API
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse("http://202.169.231.66:82/api/v1/gis/post-data-ont"),
+        Uri.parse("http://202.169.224.27:8081/api/v1/gis/post-data-ont"),
       );
 
       // Field
