@@ -47,7 +47,7 @@ class DetailOntCard extends StatelessWidget {
                 Column(
                   children: [
                     SizedBox(
-                      height: 200,
+                      height: 190,
                       child: PageView.builder(
                         controller: pageController,
                         itemCount: images.length,
@@ -138,7 +138,7 @@ class DetailOntCard extends StatelessWidget {
               else
                 Container(
                   width: double.infinity,
-                  height: 150,
+                  height: 140,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(12),
