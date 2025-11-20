@@ -168,41 +168,47 @@ class DetailOntCard extends StatelessWidget {
 
   Widget _mapPreview(double lat, double lng) {
     return Container(
-      height: 120,
+      height: 150,
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
       clipBehavior: Clip.hardEdge,
-      child: AbsorbPointer(
-        absorbing: true,
-        child: FlutterMap(
-          options: MapOptions(
-            initialCenter: LatLng(lat, lng),
-            initialZoom: 15,
+      child: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(lat, lng),
+          initialZoom: 15,
+          minZoom: 3,
+          maxZoom: 19,
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.drag |
+            InteractiveFlag.pinchZoom |
+            InteractiveFlag.doubleTapZoom |
+            InteractiveFlag.flingAnimation,
           ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.gis_mobile',
-            ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: LatLng(lat, lng),
-                  width: 50,
-                  height: 50,
-                  child: const Icon(Icons.location_pin,
-                      color: Colors.red, size: 40),
-                ),
-              ],
-            ),
-          ],
         ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.gis_mobile',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(lat, lng),
+                width: 50,
+                height: 50,
+                child: const Icon(Icons.location_pin,
+                    color: Colors.red, size: 40),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _buildDetail(String label, String? value) {
     return Container(
