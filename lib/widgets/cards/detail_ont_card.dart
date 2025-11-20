@@ -107,8 +107,15 @@ class DetailOntCard extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-              _buildDetail("Nomor ONT", "GIS-ID-${ont.nomorOnt}"),
-              _buildDetail("Provinsi", ont.area),
+
+              Row(
+                children: [
+                  _buildDetail("Nomor ONT", "GIS-ID-${ont.nomorOnt}"),
+                  SizedBox(width: 6),
+                  Expanded(child: _buildDetail("Provinsi", ont.area))
+                ],
+              ),
+
               _buildDetail("Petugas", ont.namaPetugas),
               _buildDetail("Deskripsi", ont.deskripsiRumah),
 
@@ -139,48 +146,60 @@ class DetailOntCard extends StatelessWidget {
               _coordRow("Latitude", ont.latitude),
               _coordRow("Longitude", ont.longitude),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => openGoogleMaps(lat!, lng!),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+              const SizedBox(height: 4),
+
+              Row(
+                children: [
+
+                  SizedBox(
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: AppColors.thirdBase,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        "Kembali",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
-                  icon: const Icon(Icons.map, color: Colors.white),
-                  label: Text(
-                    "Buka di Google Maps",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+
+                  SizedBox(width: 8),
+
+                  Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton.icon(
+                          onPressed: () => openGoogleMaps(lat!, lng!),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.map, color: Colors.white),
+                          label: Text(
+                            "Buka di Google Maps",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                  )
+                ],
               ),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: AppColors.thirdBase,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: Text(
-                    "Kembali",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -233,24 +252,23 @@ class DetailOntCard extends StatelessWidget {
 
   Widget _buildDetail(String label, String? value) {
     return Container(
-      width: double.infinity,
-      height: 45,
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: AppColors.fifthBase,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        value ?? "-",
-        style: GoogleFonts.poppins(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-          color: AppColors.textDarkGray,
-        ),
-      ),
-    );
+          height: 45,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: AppColors.fifthBase,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            value ?? "-",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: AppColors.textDarkGray,
+            ),
+          ),
+        );
   }
 
   Widget _coordRow(String label, String? value) {

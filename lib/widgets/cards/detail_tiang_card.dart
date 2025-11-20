@@ -107,8 +107,15 @@ class DetailTiangCard extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-              _buildDetail("Nomor Tiang", "GIS-ID-${tiang.nomorTiang}"),
-              _buildDetail("Provinsi", tiang.area),
+
+              Row(
+                children: [
+                  _buildDetail("Nomor Tiang", "GIS-ID-${tiang.nomorTiang}"),
+                  SizedBox(width: 6),
+                  Expanded(child: _buildDetail("Provinsi", tiang.area))
+                ],
+              ),
+
               _buildDetail("Petugas", tiang.namaPetugas),
               _buildDetail("Deskripsi", tiang.deskripsiTiang),
 
@@ -139,48 +146,60 @@ class DetailTiangCard extends StatelessWidget {
               _coordRow("Latitude", tiang.latitude),
               _coordRow("Longitude", tiang.longitude),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => openGoogleMaps(lat!, lng!),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  icon: const Icon(Icons.map, color: Colors.white),
-                  label: Text(
-                    "Buka di Google Maps",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+              Row(
+                children: [
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: AppColors.thirdBase,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                  SizedBox(
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: AppColors.thirdBase,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        "Kembali",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "Kembali",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+
+                  SizedBox(width: 8),
+
+                  Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton.icon(
+                          onPressed: () => openGoogleMaps(lat!, lng!),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.map, color: Colors.white),
+                          label: Text(
+                            "Buka di Google Maps",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                  )
+
+                ],
+              )
+
+
             ],
           ),
         ),
@@ -233,7 +252,6 @@ class DetailTiangCard extends StatelessWidget {
 
   Widget _buildDetail(String label, String? value) {
     return Container(
-      width: double.infinity,
       height: 45,
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.all(12),
