@@ -53,16 +53,25 @@ class DetailTiangCard extends StatelessWidget {
                         itemBuilder: (context, i) {
                           return ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              images[i],
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: AppColors.fifthBase,
-                                child: const Icon(Icons.broken_image,
-                                    color: Colors.grey, size: 50),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => FullImageView(imageUrl: images[i]),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  images[i],
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
+                            )
+
                           );
                         },
                       ),
@@ -323,4 +332,33 @@ class DetailTiangCard extends StatelessWidget {
     }
   }
 
+}
+
+class FullImageView extends StatelessWidget {
+  final String imageUrl;
+
+  const FullImageView({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          clipBehavior: Clip.none,
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
 }
