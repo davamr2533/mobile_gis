@@ -27,7 +27,6 @@ class DetailOntCard extends StatelessWidget {
         _fixUrl(ont.fotoOnt3!),
     ];
 
-
     final pageController = PageController();
 
     // Konversi string latitude & longitude ke double
@@ -162,7 +161,6 @@ class DetailOntCard extends StatelessWidget {
                 ),
               ),
 
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -232,7 +230,6 @@ class DetailOntCard extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildDetail(String label, String? value) {
     return Container(
@@ -307,9 +304,5 @@ class DetailOntCard extends StatelessWidget {
       print("Gagal membuka Google Maps.");
     }
   }
-
-
-
-
 
 }

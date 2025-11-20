@@ -5,6 +5,8 @@ import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class DetailTiangCard extends StatelessWidget {
   final TiangModel tiang;
@@ -137,7 +139,28 @@ class DetailTiangCard extends StatelessWidget {
               _coordRow("Latitude", tiang.latitude),
               _coordRow("Longitude", tiang.longitude),
 
-              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => openGoogleMaps(lat!, lng!),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  icon: const Icon(Icons.map, color: Colors.white),
+                  label: Text(
+                    "Buka di Google Maps",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -167,38 +190,43 @@ class DetailTiangCard extends StatelessWidget {
 
   Widget _mapPreview(double lat, double lng) {
     return Container(
-      height: 120,
+      height: 150,
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
       clipBehavior: Clip.hardEdge,
-      child: AbsorbPointer(
-        absorbing: true,
-        child: FlutterMap(
-          options: MapOptions(
-            initialCenter: LatLng(lat, lng),
-            initialZoom: 15,
+      child: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(lat, lng),
+          initialZoom: 15,
+          minZoom: 3,
+          maxZoom: 19,
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.drag |
+            InteractiveFlag.pinchZoom |
+            InteractiveFlag.doubleTapZoom |
+            InteractiveFlag.flingAnimation,
           ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.gis_mobile',
-            ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: LatLng(lat, lng),
-                  width: 50,
-                  height: 50,
-                  child: const Icon(Icons.location_pin,
-                      color: Colors.red, size: 40),
-                ),
-              ],
-            ),
-          ],
         ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.gis_mobile',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(lat, lng),
+                width: 50,
+                height: 50,
+                child: const Icon(Icons.location_pin,
+                    color: Colors.red, size: 40),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -266,16 +294,15 @@ class DetailTiangCard extends StatelessWidget {
     return url;
   }
 
+  Future<void> openGoogleMaps(double lat, double lng) async {
+    final Uri url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      print("Gagal membuka Google Maps.");
+    }
+  }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
