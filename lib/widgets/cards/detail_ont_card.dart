@@ -5,6 +5,8 @@ import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class DetailOntCard extends StatelessWidget {
   final OntModel ont;
@@ -138,7 +140,29 @@ class DetailOntCard extends StatelessWidget {
               _coordRow("Latitude", ont.latitude),
               _coordRow("Longitude", ont.longitude),
 
-              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => openGoogleMaps(lat!, lng!),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  icon: const Icon(Icons.map, color: Colors.white),
+                  label: Text(
+                    "Buka di Google Maps",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -272,6 +296,20 @@ class DetailOntCard extends StatelessWidget {
     }
     return url;
   }
+
+  Future<void> openGoogleMaps(double lat, double lng) async {
+    final Uri url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      print("Gagal membuka Google Maps.");
+    }
+  }
+
+
+
 
 
 }
