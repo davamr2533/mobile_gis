@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:gis_mobile/widgets/pop_up/loading.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_confirm.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_delete_success.dart';
@@ -10,6 +11,7 @@ import 'package:gis_mobile/widgets/pop_up/pop_up_failed.dart';
 import 'package:gis_mobile/widgets/pop_up/pop_up_success.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
@@ -367,6 +369,13 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                   _buildDetail("Petugas", item['petugas']),
                   _buildDetail("Deskripsi", item['deskripsi']),
                   const Divider(),
+
+                  if (item['latitude'] != null && item['longitude'] != null)
+                    _mapPreview(
+                      item['latitude'],
+                      item['longitude'],
+                    ),
+
                   const SizedBox(height: 8),
                   _coordRow("Latitude", "${item['latitude']?.toStringAsFixed(6) ?? '-'}"),
                   _coordRow("Longitude", "${item['longitude']?.toStringAsFixed(6) ?? '-'}"),
@@ -451,6 +460,47 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                 style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 13),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _mapPreview(double lat, double lng) {
+    return Container(
+      height: 150,
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(lat, lng),
+          initialZoom: 15,
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.drag |
+            InteractiveFlag.pinchZoom |
+            InteractiveFlag.doubleTapZoom |
+            InteractiveFlag.flingAnimation,
+          ),
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.gis_mobile',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(lat, lng),
+                width: 50,
+                height: 50,
+                child: const Icon(Icons.location_pin,
+                    color: Colors.red, size: 40),
+              ),
+            ],
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:gis_mobile/api/models/ont_model.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -348,16 +349,11 @@ class FullImageView extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: InteractiveViewer(
-          clipBehavior: Clip.none,
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.contain,
-          ),
-        ),
+      body: PhotoView(
+        imageProvider: NetworkImage(imageUrl),
+        backgroundDecoration: const BoxDecoration(color: Colors.black),
+        minScale: PhotoViewComputedScale.contained * 1,
+        maxScale: PhotoViewComputedScale.covered * 3,
       ),
     );
   }
