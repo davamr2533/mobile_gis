@@ -130,11 +130,9 @@ class _DraftOntTabState extends State<DraftOntTab> {
         });
 
       } else {
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Gagal upload: ${response.statusCode}")),
         );
-
       }
 
     } catch (e) {
@@ -325,7 +323,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
                     Column(
                       children: [
                         SizedBox(
-                          height: 200,
+                          height: 160,
                           child: PageView.builder(
                             controller: pageController,
                             itemCount: images.length,
@@ -365,11 +363,21 @@ class _DraftOntTabState extends State<DraftOntTab> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildDetail("Nomor ONT", "GIS-ID-${item['ontNumber'] ?? '-'}"),
-                  _buildDetail("Provinsi", item['provinsi']),
+
+                  Row(
+                    children: [
+                      _buildDetail("Nomor ONT", "GIS-ID-${item['ontNumber'] ?? '-'}"),
+                      SizedBox(width: 6),
+                      Expanded(child: _buildDetail("Provinsi", item['provinsi']))
+                    ],
+                  ),
+
                   _buildDetail("Petugas", item['petugas']),
                   _buildDetail("Deskripsi", item['deskripsi']),
-                  const Divider(),
+
+                  const Divider(height: 2, color: Colors.black54),
+
+                  const SizedBox(height: 8),
 
                   if (item['latitude'] != null && item['longitude'] != null)
                     _mapPreview(
@@ -382,39 +390,45 @@ class _DraftOntTabState extends State<DraftOntTab> {
                   _coordRow("Longitude", "${item['longitude']?.toStringAsFixed(6) ?? '-'}"),
                   const SizedBox(height: 8),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => _uploadToServer(item, images, index),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: AppColors.thirdBase,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            "Kembali",
+                            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        "Kirim Ulang",
-                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 4),
+                      SizedBox(width: 8),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: AppColors.thirdBase,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                      ),
-                      child: Text(
-                        "Kembali",
-                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
+                      Expanded(
+                        child: SizedBox(
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: () => _uploadToServer(item, images, index),
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text(
+                              "Kirim Ulang",
+                              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),
@@ -426,7 +440,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
 
   Widget _buildDetail(String label, String? value) {
     return Container(
-      width: double.infinity,
       height: 45,
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.all(12),
@@ -507,7 +520,6 @@ class _DraftOntTabState extends State<DraftOntTab> {
       ),
     );
   }
-
 
   String _formatDate(String? isoDate) {
     if (isoDate == null) return "-";
