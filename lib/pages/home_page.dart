@@ -306,8 +306,8 @@ class _HomePage extends State<HomePage> {
                           const SizedBox(width: 16),
                           Image.asset(
                             'assets/profil.png',
-                            width: 80,
-                            height: 80,
+                            width: 70,
+                            height: 70,
                           ),
                         ],
                       ),
