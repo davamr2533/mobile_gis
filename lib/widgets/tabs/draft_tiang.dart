@@ -25,6 +25,11 @@ class DraftTiangTab extends StatefulWidget {
 
 class _DraftTiangTabState extends State<DraftTiangTab> {
   List<Map<String, dynamic>> drafts = [];
+  String _getCurrentDatetime() {
+    final now = DateTime.now();
+    return "${now.year}-${now.month.toString().padLeft(2,'0')}-${now.day.toString().padLeft(2,'0')} "
+        "${now.hour.toString().padLeft(2,'0')}:${now.minute.toString().padLeft(2,'0')}:${now.second.toString().padLeft(2,'0')}";
+  }
 
   @override
   void initState() {
@@ -96,6 +101,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         "status_notifikasi": "Pending",
         "tipe_notifikasi": "Submitted",
         "fcm_token": token ?? "",
+        "datetime": _getCurrentDatetime(),
       });
 
       // Kirim file langsung dari base64 (tanpa kompres)
