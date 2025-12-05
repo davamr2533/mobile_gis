@@ -30,6 +30,11 @@ class _FormTiangPageState extends State<FormTiangPage> {
   List<XFile> selectedImages = [];
   String? selectedProv;
   bool isOnline = false;
+  String getCurrentDatetime() {
+    final now = DateTime.now();
+    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} "
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+  }
 
   List<String> dialogProvinsi = [
     "Aceh",
@@ -186,7 +191,8 @@ class _FormTiangPageState extends State<FormTiangPage> {
           status: "Pending",
           statusNotifikasi: "Pending",
           tipeNotifikasi: "Submitted",
-          fcmToken: token ?? ""
+          fcmToken: token ?? "",
+          datetime: getCurrentDatetime()
         );
 
         // Tutup loading dialog
