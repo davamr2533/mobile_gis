@@ -278,7 +278,7 @@ class _HomePage extends State<HomePage> {
                                   "Explore, locate, synchronize",
                                   style: GoogleFonts.poppins(
                                     color: AppColors.textSoftGray,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
