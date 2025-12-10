@@ -4,6 +4,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:gis_mobile/api/models/wilayah_model.dart';
+import 'package:gis_mobile/api/services/get/get_wilayah.dart';
 import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -28,55 +30,15 @@ class _FormOntPageState extends State<FormOntPage> {
   double? selectedLatitude;
   double? selectedLongitude;
   List<XFile> selectedImages = [];
-  String? selectedProv;
+  WilayahModel? selectedWilayah;
+  List<WilayahModel> listWilayah = [];
+  bool isLoadingWilayah = true;
   bool isOnline = false;
   String getCurrentDatetime() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} "
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
   }
-
-
-  List<String> dialogProvinsi = [
-    "Aceh",
-    "Sumatera Utara",
-    "Sumatera Barat",
-    "Riau",
-    "Jambi",
-    "Sumatera Selatan",
-    "Bengkulu",
-    "Lampung",
-    "Kep. Bangka Belitung",
-    "Kep. Riau",
-    "DKI Jakarta",
-    "Jawa Barat",
-    "Jawa Tengah",
-    "DI Yogyakarta",
-    "Jawa Timur",
-    "Banten",
-    "Bali",
-    "Nusa Tenggara Barat",
-    "Nusa Tenggara Timur",
-    "Kalimantan Barat",
-    "Kalimantan Tengah",
-    "Kalimantan Selatan",
-    "Kalimantan Timur",
-    "Kalimantan Utara",
-    "Sulawesi Utara",
-    "Sulawesi Tengah",
-    "Sulawesi Selatan",
-    "Sulawesi Tenggara",
-    "Gorontalo",
-    "Sulawesi Barat",
-    "Maluku",
-    "Maluku Utara",
-    "Papua",
-    "Papua Barat",
-    "Papua Tengah",
-    "Papua Pegunungan",
-    "Papua Selatan",
-    "Papua Barat Daya",
-  ];
 
   final TextEditingController _ontController = TextEditingController();
   final TextEditingController _petugasController = TextEditingController();
@@ -86,12 +48,29 @@ class _FormOntPageState extends State<FormOntPage> {
   void initState() {
     super.initState();
     checkConnection();
+    loadWilayah();
+
 
     // pantau koneksi real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
       final hasNetwork = await _hasNetworkConnection(results);
       if (mounted) setState(() => isOnline = hasNetwork);
     });
+
+  }
+
+  //Ambil data area wilayah
+  void loadWilayah() async {
+    try {
+      final data = await WilayahService.fetchDataWilayah();
+      setState(() {
+        listWilayah = data;
+        isLoadingWilayah = false;
+      });
+    } catch (e) {
+      print("Error: $e");
+      setState(() => isLoadingWilayah = false);
+    }
   }
 
   // === Cek koneksi internet dengan ping ===
@@ -133,7 +112,7 @@ class _FormOntPageState extends State<FormOntPage> {
     if (_ontController.text.isEmpty ||
         _petugasController.text.isEmpty ||
         _deskripsiController.text.isEmpty ||
-        selectedProv == null ||
+        selectedWilayah == null ||
         selectedImages.isEmpty ||
         selectedLatitude == null ||
         selectedLongitude == null) {
@@ -181,7 +160,7 @@ class _FormOntPageState extends State<FormOntPage> {
         // Kirim data ke server
         bool success = await OntPostService.postDataOnt(
           nomorOnt: _ontController.text.trim(),
-          area: selectedProv!, // dari dropdown
+          area: selectedWilayah!.name, // dari dropdown
           deskripsiRumah: _deskripsiController.text.trim(),
           fotoOnt1: foto1,
           fotoOnt2: foto2,
@@ -250,7 +229,7 @@ class _FormOntPageState extends State<FormOntPage> {
         final draft = {
           'id': DateTime.now().millisecondsSinceEpoch,
           'ontNumber': _ontController.text.trim(),
-          'provinsi': selectedProv,
+          'provinsi': selectedWilayah?.name,
           'petugas': _petugasController.text.trim(),
           'deskripsi': _deskripsiController.text.trim(),
           'latitude': selectedLatitude,
@@ -380,25 +359,37 @@ class _FormOntPageState extends State<FormOntPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
+                  child: DropdownButton<WilayahModel>(
 
-                    value: selectedProv,
+                    value: selectedWilayah,
                     hint: Text(
-                      "Pilih Provinsi",
+                      "Pilih Area",
                       style: GoogleFonts.poppins(
                         color: Colors.black54,
                         fontWeight: FontWeight.w500,
-                        fontSize: 13,
+                        fontSize: 12,
                       ),
                     ),
                     isExpanded: true,
-                    items: dialogProvinsi.map((prov) {
+                    items: listWilayah.map((wil) {
                       return DropdownMenuItem(
-                        value: prov,
-                        child: Text(prov, style: GoogleFonts.poppins()),
+                        value: wil,
+                        child: Text(wil.name, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 14)),
                       );
                     }).toList(),
-                    onChanged: (value) => setState(() => selectedProv = value),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedWilayah = value;
+
+                        // Otomatis isi prefix ONT
+                        _ontController.text = "${value?.kode}";
+
+                        // Cursor otomatis pindah ke belakang
+                        _ontController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: _ontController.text.length),
+                        );
+                      });
+                    },
 
                   )
                 ),
