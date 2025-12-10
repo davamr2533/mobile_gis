@@ -80,7 +80,7 @@ class HistoryOntCard extends StatelessWidget {
                       SizedBox(height: 45),
 
                       Text(
-                        "GIS-ID-${ont.nomorOnt}",
+                        ont.nomorOnt,
                         style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             fontSize: 13,

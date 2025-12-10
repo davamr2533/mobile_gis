@@ -80,7 +80,7 @@ class HistoryTiangCard extends StatelessWidget {
                         SizedBox(height: 45),
 
                         Text(
-                          "GIS-ID-${tiang.nomorTiang}",
+                          tiang.nomorTiang,
                           style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 13,

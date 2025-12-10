@@ -50,13 +50,11 @@ class _FormOntPageState extends State<FormOntPage> {
     checkConnection();
     loadWilayah();
 
-
     // pantau koneksi real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
       final hasNetwork = await _hasNetworkConnection(results);
       if (mounted) setState(() => isOnline = hasNetwork);
     });
-
   }
 
   //Ambil data area wilayah
@@ -348,9 +346,6 @@ class _FormOntPageState extends State<FormOntPage> {
               ),
               const SizedBox(height: 16),
 
-              _buildTextField("Nomor ONT", controller: _ontController),
-              const SizedBox(height: 12),
-
               // === PROVINSI ===
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -366,8 +361,7 @@ class _FormOntPageState extends State<FormOntPage> {
                       "Pilih Area",
                       style: GoogleFonts.poppins(
                         color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                     ),
                     isExpanded: true,
@@ -394,6 +388,9 @@ class _FormOntPageState extends State<FormOntPage> {
                   )
                 ),
               ),
+              const SizedBox(height: 12),
+
+              _buildTextField("Nomor ONT", controller: _ontController),
               const SizedBox(height: 12),
 
               _buildTextField("Nama Petugas", controller: _petugasController),

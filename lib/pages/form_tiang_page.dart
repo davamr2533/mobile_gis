@@ -4,6 +4,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:gis_mobile/api/models/wilayah_model.dart';
+import 'package:gis_mobile/api/services/get/get_wilayah.dart';
 import 'package:gis_mobile/api/services/post/post_data_tiang.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -28,54 +30,15 @@ class _FormTiangPageState extends State<FormTiangPage> {
   double? selectedLatitude;
   double? selectedLongitude;
   List<XFile> selectedImages = [];
-  String? selectedProv;
+  WilayahModel? selectedWilayah;
+  List<WilayahModel> listWilayah = [];
+  bool isLoadingWilayah = true;
   bool isOnline = false;
   String getCurrentDatetime() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} "
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
   }
-
-  List<String> dialogProvinsi = [
-    "Aceh",
-    "Sumatera Utara",
-    "Sumatera Barat",
-    "Riau",
-    "Jambi",
-    "Sumatera Selatan",
-    "Bengkulu",
-    "Lampung",
-    "Kep. Bangka Belitung",
-    "Kep. Riau",
-    "DKI Jakarta",
-    "Jawa Barat",
-    "Jawa Tengah",
-    "DI Yogyakarta",
-    "Jawa Timur",
-    "Banten",
-    "Bali",
-    "Nusa Tenggara Barat",
-    "Nusa Tenggara Timur",
-    "Kalimantan Barat",
-    "Kalimantan Tengah",
-    "Kalimantan Selatan",
-    "Kalimantan Timur",
-    "Kalimantan Utara",
-    "Sulawesi Utara",
-    "Sulawesi Tengah",
-    "Sulawesi Selatan",
-    "Sulawesi Tenggara",
-    "Gorontalo",
-    "Sulawesi Barat",
-    "Maluku",
-    "Maluku Utara",
-    "Papua",
-    "Papua Barat",
-    "Papua Tengah",
-    "Papua Pegunungan",
-    "Papua Selatan",
-    "Papua Barat Daya",
-  ];
 
   final TextEditingController _tiangController = TextEditingController();
   final TextEditingController _petugasController = TextEditingController();
@@ -85,12 +48,27 @@ class _FormTiangPageState extends State<FormTiangPage> {
   void initState() {
     super.initState();
     checkConnection();
+    loadWilayah();
 
     // pantau koneksi real-time
     Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) async {
       final hasNetwork = await _hasNetworkConnection(results);
       if (mounted) setState(() => isOnline = hasNetwork);
     });
+  }
+
+  //Ambil data area wilayah
+  void loadWilayah() async {
+    try {
+      final data = await WilayahService.fetchDataWilayah();
+      setState(() {
+        listWilayah = data;
+        isLoadingWilayah = false;
+      });
+    } catch (e) {
+      print("Error: $e");
+      setState(() => isLoadingWilayah = false);
+    }
   }
 
   // === Cek koneksi internet dengan ping ===
@@ -132,7 +110,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
     if (_tiangController.text.isEmpty ||
         _petugasController.text.isEmpty ||
         _deskripsiController.text.isEmpty ||
-        selectedProv == null ||
+        selectedWilayah == null ||
         selectedImages.isEmpty ||
         selectedLatitude == null ||
         selectedLongitude == null) {
@@ -180,7 +158,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
         // Kirim data ke server
         bool success = await TiangPostService.postDataTiang(
           nomorTiang: _tiangController.text.trim(),
-          area: selectedProv!, // dari dropdown
+          area: selectedWilayah!.name, // dari dropdown
           deskripsiTiang: _deskripsiController.text.trim(),
           fotoTiang1: foto1,
           fotoTiang2: foto2,
@@ -192,7 +170,8 @@ class _FormTiangPageState extends State<FormTiangPage> {
           statusNotifikasi: "Pending",
           tipeNotifikasi: "Submitted",
           fcmToken: token ?? "",
-          datetime: getCurrentDatetime()
+          datetime: getCurrentDatetime(),
+          kodeTiang: _tiangController.text.trim()
         );
 
         // Tutup loading dialog
@@ -215,9 +194,14 @@ class _FormTiangPageState extends State<FormTiangPage> {
 
         } else {
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Gagal kirim data ke server")),
-          );
+          try {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Gagal kirim data ke server")),
+            );
+          } catch (e, s) {
+            print("ERROR CATCH: $e");
+            print("STACKTRACE: $s");
+          }
 
         }
       } catch (e) {
@@ -249,7 +233,7 @@ class _FormTiangPageState extends State<FormTiangPage> {
         final draft = {
           'id': DateTime.now().millisecondsSinceEpoch,
           'tiangNumber': _tiangController.text.trim(),
-          'provinsi': selectedProv,
+          'provinsi': selectedWilayah?.name,
           'petugas': _petugasController.text.trim(),
           'deskripsi': _deskripsiController.text.trim(),
           'latitude': selectedLatitude,
@@ -368,9 +352,6 @@ class _FormTiangPageState extends State<FormTiangPage> {
               ),
               const SizedBox(height: 16),
 
-              _buildTextField("Nomor Tiang", controller: _tiangController),
-              const SizedBox(height: 12),
-
               // === PROVINSI ===
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -379,9 +360,9 @@ class _FormTiangPageState extends State<FormTiangPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
+                    child: DropdownButton<WilayahModel>(
 
-                      value: selectedProv,
+                      value: selectedWilayah,
                       hint: Text(
                         "Pilih Provinsi",
                         style: GoogleFonts.poppins(
@@ -391,17 +372,32 @@ class _FormTiangPageState extends State<FormTiangPage> {
                         ),
                       ),
                       isExpanded: true,
-                      items: dialogProvinsi.map((prov) {
+                      items: listWilayah.map((wil) {
                         return DropdownMenuItem(
-                          value: prov,
-                          child: Text(prov, style: GoogleFonts.poppins()),
+                          value: wil,
+                          child: Text(wil.name, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 14)),
                         );
                       }).toList(),
-                      onChanged: (value) => setState(() => selectedProv = value),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedWilayah = value;
+
+                          // Otomatis isi prefix ONT
+                          _tiangController.text = "${value?.kode}";
+
+                          // Cursor otomatis pindah ke belakang
+                          _tiangController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: _tiangController.text.length),
+                          );
+                        });
+                      },
 
                     )
                 ),
               ),
+              const SizedBox(height: 12),
+
+              _buildTextField("Nomor Tiang", controller: _tiangController),
               const SizedBox(height: 12),
 
               _buildTextField("Nama Petugas", controller: _petugasController),

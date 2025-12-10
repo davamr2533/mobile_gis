@@ -85,7 +85,7 @@ class NotificationCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "GIS-ID-${notif.nomor}",
+                      notif.nomor,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade700,

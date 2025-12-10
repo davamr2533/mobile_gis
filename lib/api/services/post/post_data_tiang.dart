@@ -20,6 +20,8 @@ class TiangPostService {
     required String tipeNotifikasi,
     required String fcmToken,
     required String datetime,
+    required String kodeTiang,
+
   }) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
@@ -36,6 +38,7 @@ class TiangPostService {
       request.fields['tipe_notifikasi'] = tipeNotifikasi;
       request.fields['fcm_token'] = fcmToken;
       request.fields['datetime'] = datetime;
+      request.fields['kode_tiang'] = kodeTiang;
 
       // File upload
       if (fotoTiang1 != null) {

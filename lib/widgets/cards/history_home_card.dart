@@ -40,7 +40,7 @@ class HistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "GIS-ID-$id",
+                      id,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSoftGray,
