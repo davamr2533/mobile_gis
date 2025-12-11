@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:gis_mobile/api/models/wilayah_model.dart';
 import 'package:gis_mobile/api/services/get/get_wilayah.dart';
+import 'package:gis_mobile/api/services/get/get_wilayah_offline.dart';
 import 'package:gis_mobile/api/services/post/post_data_ont.dart';
 import 'package:gis_mobile/colors/app_colors.dart';
 import 'package:gis_mobile/pages/main_page.dart';
@@ -66,8 +67,11 @@ class _FormOntPageState extends State<FormOntPage> {
         isLoadingWilayah = false;
       });
     } catch (e) {
-      print("Error: $e");
-      setState(() => isLoadingWilayah = false);
+      // fallback ke static list
+      setState(() {
+        listWilayah = getWilayahOffline;
+        isLoadingWilayah = false;
+      });
     }
   }
 
@@ -374,9 +378,6 @@ class _FormOntPageState extends State<FormOntPage> {
                     onChanged: (value) {
                       setState(() {
                         selectedWilayah = value;
-
-                        // Otomatis isi prefix ONT
-                        _ontController.text = "${value?.kode}";
 
                         // Cursor otomatis pindah ke belakang
                         _ontController.selection = TextSelection.fromPosition(
