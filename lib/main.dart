@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:gis_mobile/api/services/notification_service.dart';
-import 'firebase_options.dart';
+import 'package:gis_mobile/pages/main_page.dart';
 import 'package:gis_mobile/splash_screen.dart';
 
+import 'firebase_options.dart';
 
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Init Firebase
@@ -28,12 +30,21 @@ void main() async {
   String? token = await FirebaseMessaging.instance.getToken();
   print("FCM TOKEN DEVICE : $token");
 
+  // 🔑 Cek pertama kali buka aplikasi
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstOpen = prefs.getBool('isFirstOpen') ?? true;
 
-  runApp(const MyApp());
+  if (isFirstOpen) {
+    await prefs.setBool('isFirstOpen', false);
+  }
+
+  runApp(MyApp(isFirstOpen: isFirstOpen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isFirstOpen;
+
+  const MyApp({super.key, required this.isFirstOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +55,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: false,
       ),
-      home: const SplashScreen(),
+      home: isFirstOpen
+          ? const SplashScreen()
+          : const MainPage(),
     );
   }
 }
@@ -63,5 +76,3 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     );
   }
 }
-
-

@@ -211,7 +211,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
                             Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                "GIS-ID-${item['ontNumber'] ?? '-'}",
+                                "${item['ontNumber'] ?? '-'}",
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -373,7 +373,7 @@ class _DraftOntTabState extends State<DraftOntTab> {
 
                   Row(
                     children: [
-                      _buildDetail("Nomor ONT", "GIS-ID-${item['ontNumber'] ?? '-'}"),
+                      _buildDetail("Nomor ONT", "${item['ontNumber'] ?? '-'}"),
                       SizedBox(width: 6),
                       Expanded(child: _buildDetail("Provinsi", item['provinsi']))
                     ],

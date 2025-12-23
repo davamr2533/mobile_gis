@@ -102,6 +102,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
         "tipe_notifikasi": "Submitted",
         "fcm_token": token ?? "",
         "datetime": _getCurrentDatetime(),
+        "kode_tiang": item['tiangNumber'],
       });
 
       // Kirim file langsung dari base64 (tanpa kompres)
@@ -210,7 +211,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
                             Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
-                                "GIS-ID-${item['tiangNumber'] ?? '-'}",
+                                "${item['tiangNumber'] ?? '-'}",
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -372,7 +373,7 @@ class _DraftTiangTabState extends State<DraftTiangTab> {
 
                   Row(
                     children: [
-                      _buildDetail("Nomor Tiang", "GIS-ID-${item['tiangNumber'] ?? '-'}"),
+                      _buildDetail("Nomor Tiang", "${item['tiangNumber'] ?? '-'}"),
                       SizedBox(width: 6),
                       Expanded(child: _buildDetail("Provinsi", item['provinsi']),)
                     ],
